@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<h1>Homepage</h1>
+
+<a href="{% url 'inventory:categories' %}">Categories</a>
+<br>
+<br>
+
+
+<a class="btn btn-info text-light" href="{% url 'inventory:add-product' %}">Create a New product</a>
+
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Categories</h1>
+    <ul>
+    {% for category in data %}
+        <li>
+            {% if category.get_children %}
+                <a href="{% url 'inventory:category' category_slug=category.slug %}">{{ category.name }}</a>
+            {% else %}
+                <a href="{% url 'inventory:product_by_category' category_slug=category.slug %}">{{ category.name }}</a>
+            {% endif %}
+        </li>
+
+    {% endfor %}
+    </ul>
+
+{%endblock%}

@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+{% load custom_tags %}
+    <div class="row">
+        <div class="aside col-4 border">
+            <h3>Category Attrs</h3>
+            <ul>
+                {% for attr in category_attrs %}
+                <li>
+                   {{ attr.name }}:
+                </li>
+                    {% if attr.name in INPUT_TYPE_RANGE %}
+                        <div class="input-group">
+                            {% with attr.name as name %}
+                            <input
+                                class="range-attrs form-control rounded"
+                                name="{{ name }}-min"
+                                {% if range_filter_dict|from_dict:name|from_list:0 %}
+                                    value="{{ range_filter_dict|from_dict:name|from_list:0 }}"
+                                {% else %}
+                                    value=""
+                                {% endif %}
+                                placeholder="min value"
+                            >
+                            <input
+                                class="range-attrs form-control mx-1 rounded"
+                                name="{{ name }}-max"
+                                {% if range_filter_dict|from_dict:name|from_list:1 %}
+                                    value="{{ range_filter_dict|from_dict:name|from_list:1 }}"
+                                {% else %}
+                                    value=""
+                                {% endif %}
+                                placeholder="max value"
+                            >
+                            {% endwith %}
+                        </div>
+                    {% else %}
+                    {% for val in attr_values %}
+                    {% if val.product_attribute__name == attr.name %}
+                        {% with attr.name|addstr:val.value as value %}
+                        
+                        <input 
+                            class="checkbox-attrs"
+                            type="checkbox"
+                            name="{{ value }}"
+                            value="{{ value }}"
+                            {% if value in box_arguments %}
+                            checked
+                            {% else %}
+                            {% endif %}
+                        >
+                        <label for="{{ value }}">{{ val.value }}</label><br>
+                        {% endwith %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
+                {% endfor %}
+            </ul>
+
+
+            <h3>Attr Values</h3>
+            <ul>
+                {% for attr in attr_values %}
+                <li>
+                   {{ attr.product_attribute__name }}: {{ attr.value }}
+                   ({{ attr.product_attribute__category__id}})
+                </li>
+                {% endfor %}
+            </ul>
+            <form id="attrs" method="post">
+                {% csrf_token %}
+            </form>
+
+            <div class="submit btn btn-primary">Filter</div>
+
+        </div>
+
+        <div class="col-8">
+            <h1>Products</h1>
+            <h2><small>in</small> {{ category_name }}</h2>
+            <ul>
+            {% for product in products %}
+                <li>
+                    <a href="">{{ product.name }}</a><br>
+                    {{ product.id }}<br>
+                    {% comment %} Price: ${{ product.product__store_price }} ({{product.product__product_inventory__units}} pcs.) {% endcomment %}
+                </li>
+            {% endfor %}
+            </ul>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+        let submit = document.querySelector('.submit')
+        let form = document.getElementById("attrs")
+        let checkboxes = document.querySelectorAll('.checkbox-attrs')
+        let range_items = document.querySelectorAll('.range-attrs')
+
+        
+
+        window.addEventListener('load', function(e){
+            console.log('loaded');
+        })
+
+        submit.addEventListener('click', function(e){
+            let args1 = document.createElement("input");
+            let args2 = document.createElement("input");
+            let box_attrs = [];
+
+            checkboxes.forEach(function(box){
+                if (box.checked == true) {
+                    box_attrs.push(box.value);
+                };
+            });
+
+            let range_attrs = [];
+            range_items.forEach(function(item){
+                if (item.value != '') {
+                    range_attrs.push(item.name + ':' + item.value);
+                } 
+            });
+
+            console.log(range_attrs);
+            
+            args1.setAttribute("type", "hidden");
+            args1.setAttribute("name", "box_attrs");
+            args1.setAttribute("value", box_attrs.join('&'));
+
+            args2.setAttribute("type", "hidden");
+            args2.setAttribute("name", "range_attrs");
+            args2.setAttribute("value", range_attrs.join('&'));
+
+            form.appendChild(args1);
+            form.appendChild(args2);
+
+            console.log(form);
+            $('body').append(form);
+            form.submit();
+        });
+
+        {% comment %} submit.addEventListener('click', function(e){
+            let currentpath = document.URL;
+            let formData = new FormData($('form')[0]);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            $.ajax({
+                    url: currentpath,
+                    type: 'POST',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+            console.log(submit);
+        }); {% endcomment %}
+        
+    </script>
+
+{% endblock %}
