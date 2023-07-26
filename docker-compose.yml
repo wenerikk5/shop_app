@@ -12,13 +12,13 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 
-  esearch:
-    container_name: search
-    image: elasticsearch:7.14.2
-    environment:
-      - discovery.type=single-node
-    ports:
-      - 9500:9200
+  # esearch:
+  #   container_name: search
+  #   image: elasticsearch:7.14.2
+  #   environment:
+  #     - discovery.type=single-node
+  #   ports:
+  #     - 9500:9200
 
 
 

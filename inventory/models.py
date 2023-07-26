@@ -68,6 +68,7 @@ class ProductItem(models.Model):
     attribute_value = models.ManyToManyField(
         'ProductAttributeValue',
         through='ProductItemAttribute',
+        related_name='product_item',
     )
     # created_at = models.DateTimeField(auto_now_add=True)
 

@@ -60,16 +60,6 @@
                 {% endfor %}
             </ul>
 
-
-            <h3>Attr Values</h3>
-            <ul>
-                {% for attr in attr_values %}
-                <li>
-                   {{ attr.product_attribute__name }}: {{ attr.value }}
-                   ({{ attr.product_attribute__category__id}})
-                </li>
-                {% endfor %}
-            </ul>
             <form id="attrs" method="post">
                 {% csrf_token %}
             </form>
