@@ -3,7 +3,9 @@
 
 {% block content %}
 {% load custom_tags %}
+
     <div class="row">
+        
         <div class="aside col-4 border">
             <h3>Category Attrs</h3>
             <ul>
@@ -69,13 +71,25 @@
         </div>
 
         <div class="col-8">
+            <div class="tree mb-2">
+                {% for ancestor in category.get_ancestors %}
+                    <a  href="{% url 'inventory:category' category_slug=ancestor.slug %}"
+                        class="badge bg-light text-secondary border text-decoration-none"
+                    >{{ ancestor.name }}</a><span class="text-secondary"> / </span>
+                {% endfor %}
+                <a href="#" 
+                    class="badge bg-light text-secondary border text-decoration-none"
+                >{{ category.name }}</a>
+            </div>
+
             <h1>Products</h1>
-            <h2><small>in</small> {{ category_name }}</h2>
+            <h2><small>in</small> {{ category.name }}</h2>
             <ul>
             {% for product in products %}
                 <li>
-                    <a href="">{{ product.name }}</a><br>
+                    <a href="{% url "inventory:product_detail" product_slug=product.slug %}">{{ product.name }}</a><br>
                     {{ product.id }}<br>
+                    {{ product.description }}
                     {% comment %} Price: ${{ product.product__store_price }} ({{product.product__product_inventory__units}} pcs.) {% endcomment %}
                 </li>
             {% endfor %}

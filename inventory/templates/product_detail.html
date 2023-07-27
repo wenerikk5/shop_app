@@ -2,45 +2,86 @@
 
 
 {% block content %}
-    <ul>
-        <li>
-            {{ product.product__name }}<br>
-            sku: {{ product.sku }}<br>
-            {{ product.product_inventory__units }} pcs.
-        </li>
-    </ul> 
-    
 
-    <ul> 
-        {% for attr in z %}
+<div class="row">
+        
+    <div class="aside col-4 border">
+        <h4>Model sku:</h4>
+        <ul> 
+        {% comment %} {% for attr in z %}
         <li>
-            {{ attr.product_attribute__name }}
+            {{ attr.product__attribute_value__product_attribute__name }}
             <ul>
                 {% for a in y %}
-                    {% if attr.product_attribute__name == a.attribute_values__product_attribute__name %}
-                        {% if a.attribute_values__attribute_value in product.field_a %}
-                            <li id="target-{{ a.attribute_values__attribute_value }}"
+                    {% if attr.product__attribute_value__product_attribute__name == a.attribute_value__product_attribute__name %}
+                        {% if a.attribute_value__value in product.0.field_a %}
+                            <li id="target-{{ a.attribute_value__value }}"
                                 class="selected fw-bold"
                                 data-attribute="{{ attr.product_attribute__name }}"
-                                value="{{ a.attribute_values__attribute_value }}"
+                                value="{{ a.attribute_value__value }}"
                             >
-                                {{ a.attribute_values__attribute_value }}
+                                {{ a.attribute_value__value }}
                             </li>
                         {% else %}
-                            <li id="target-{{ a.attribute_values__attribute_value }}" 
+                            <li id="target-{{ a.attribute_value__value }}" 
                                 class=""
-                                data-attribute="{{ attr.product_attribute__name }}"
-                                value="{{ a.attribute_values__attribute_value }}"
+                                data-attribute="{{ attr.product__attribute_value__product_attribute__name }}"
+                                value="{{ a.attribute_value__value }}"
                             >
-                                {{ a.attribute_values__attribute_value }}
+                                {{ a.attribute_value__value }}
                             </li>
                         {% endif %}
                     {% endif %}
                 {% endfor %}
             </ul>
         </li>
-        {% endfor %} 
+        {% endfor %}  {% endcomment %}
+
+        
+        {% for p in sku_values %}
+            {% if p.product__sku in product.0.field_a %}
+                <li id="target-{{ p.product__sku }}"
+                    class="selected fw-bold"
+                    data-attribute="sku"
+                    value="{{ p.product__sku }}"
+                >
+                    {{ p.product__sku }}
+                </li>
+            {% else %}
+                <li id="target-{{ p.product__sku }}" 
+                    class=""
+                    data-attribute="sku"
+                    value="{{ p.product__sku }}"
+                >
+                    {{ p.product__sku }}
+                </li>
+            {% endif %}
+        {% endfor %}
     </ul>
+    </div>
+    
+    <div class="col-8">
+        <div class="tree mb-2">
+            {% for ancestor in category.get_ancestors %}
+                <a  href="{% url 'inventory:category' category_slug=ancestor.slug %}"
+                    class="badge bg-light text-secondary border text-decoration-none"
+                >{{ ancestor.name }}</a><span class="text-secondary"> / </span>
+            {% endfor %}
+            <a href="{% url 'inventory:product_by_category' category_slug=category.slug %}" 
+                class="badge bg-light text-secondary border text-decoration-none"
+            >{{ category.name }}</a>
+        </div>
+
+        <h1>Product model</h1>
+        <ul>
+            <li class="fw-bold">
+                {{ product.0.product__name }}<br>
+                sku: {{ product.0.sku }}<br>
+                {% comment %} {{ product.0.product_inventory__units }} pcs. {% endcomment %}
+            </li>
+        </ul> 
+    </div>
+    
 
 <script>
     var d = {}
@@ -65,7 +106,7 @@
         let value = e.target.getAttribute("value")
         d[e.target.getAttribute("data-attribute")] = value;
 
-        let querystring = buildUrlWithParams(d);
+        let querystring = buildUrlWithParams([value]);
         let url = window.location.href.split('?')[0];
         window.location.href = url + '?' + querystring;
     }, false)
@@ -74,7 +115,7 @@
     function buildUrlWithParams(data) {
         let searchparams = [];
         for (let d in data) {
-            searchparams.push(d + '=' + data[d]);
+            searchparams.push('sku' + '=' + data[d]);
         }
         return searchparams.join('&');
     }
