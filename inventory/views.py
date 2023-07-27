@@ -70,43 +70,43 @@ def product_by_category(request, category_slug):
 
             print('range_filter_dict', range_filter_dict)
 
-        products = models.Product.objects.filter(category=category)
+        attr_names = list(box_filter_dict.keys()) + list(range_filter_dict.keys())
+        print('attr_names', attr_names)
 
-        for name in box_filter_dict.keys():
-            products = products\
-                .filter(
-                    category__product_attribute__name=name,
-                    product__attribute_value__value__in=box_filter_dict[name]
-                )
-        products = products.values('id')
+        attribute_values = models.ProductAttributeValue.objects\
+            .filter(product_attribute__category=category)\
+            .filter(product_attribute__name__in=attr_names)
 
-        # Filter by range attributes. Find attribute values, filter by 
-        # attribute name and convert to Integer for filter with gte and lte.
-        # Collect attribute values id's.
-        product_ids = set([x.get('id') for x in products])
-        first = True
+        for name, values in box_filter_dict.items():
+            attribute_values = attribute_values\
+                .filter(product_attribute__name=name,
+                        value__in=values)\
 
-        for name in range_filter_dict.keys():
+        attribute_values = attribute_values.values('product_item__product__id')
+
+        product_ids = set([x.get('product_item__product__id') for x in attribute_values])
+
+        for name, values in range_filter_dict.items():
             attribute_values = models.ProductAttributeValue.objects\
                 .filter(product_item__product__id__in=product_ids)\
-                .filter(product_attribute__name=name)\
-                .annotate(number=Cast('value',
-                                      output_field=IntegerField()))
-
-            if range_filter_dict[name][0] and range_filter_dict[name][1]:
+                .filter(product_attribute__name=name)
+            if values[0] and values[1]:
                 attribute_values = attribute_values\
                     .filter(
-                        number__gte=range_filter_dict[name][0],
-                        number__lte=range_filter_dict[name][1]
-                    ).values('product_item__product__id')
-            elif range_filter_dict[name][0]:
+                        value_number__gte=values[0],
+                        value_number__lte=values[1]
+                    )
+            elif values[0]:
                 attribute_values = attribute_values\
-                    .filter(number__gte=range_filter_dict[name][0])\
-                    .values('product_item__product__id')
+                    .filter(value_number__gte=values[0])
+
             else:
                 attribute_values = attribute_values\
-                    .filter(number__lte=range_filter_dict[name][1])\
-                    .values('product_item__product__id')
+                    .filter(value_number__lte=values[1])
+
+            attribute_values = attribute_values.values(
+                'product_item__product__id'
+            )
 
             ids = set([x.get('product_item__product__id') for x in attribute_values])
             print('product_ids:', product_ids)
@@ -115,7 +115,56 @@ def product_by_category(request, category_slug):
 
         print('product_ids:', product_ids)
 
-        products = products\
+
+
+
+
+        # products = models.Product.objects.filter(category=category)
+
+        # for name in box_filter_dict.keys():
+        #     products = products\
+        #         .filter(
+        #             category__product_attribute__name=name,
+        #             product__attribute_value__value__in=box_filter_dict[name]
+        #         )
+        # products = products.values('id')
+
+        # # Filter by range attributes. Find attribute values, filter by 
+        # # attribute name and convert to Integer for filter with gte and lte.
+        # # Collect attribute values id's.
+        # product_ids = set([x.get('id') for x in products])
+        # first = True
+
+        # for name in range_filter_dict.keys():
+        #     attribute_values = models.ProductAttributeValue.objects\
+        #         .filter(product_item__product__id__in=product_ids)\
+        #         .filter(product_attribute__name=name)\
+        #         .annotate(number=Cast('value',
+        #                               output_field=IntegerField()))
+
+        #     if range_filter_dict[name][0] and range_filter_dict[name][1]:
+        #         attribute_values = attribute_values\
+        #             .filter(
+        #                 number__gte=range_filter_dict[name][0],
+        #                 number__lte=range_filter_dict[name][1]
+        #             ).values('product_item__product__id')
+        #     elif range_filter_dict[name][0]:
+        #         attribute_values = attribute_values\
+        #             .filter(number__gte=range_filter_dict[name][0])\
+        #             .values('product_item__product__id')
+        #     else:
+        #         attribute_values = attribute_values\
+        #             .filter(number__lte=range_filter_dict[name][1])\
+        #             .values('product_item__product__id')
+
+        #     ids = set([x.get('product_item__product__id') for x in attribute_values])
+        #     print('product_ids:', product_ids)
+        #     print('ids:', ids)
+        #     product_ids = product_ids.intersection(ids)
+
+        # print('product_ids:', product_ids)
+
+        products = models.Product.objects\
             .filter(id__in=product_ids)\
             .values(
                 'id',

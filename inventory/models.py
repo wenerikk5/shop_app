@@ -100,6 +100,10 @@ class ProductAttributeValue(models.Model):
     value = models.CharField(
         max_length=200,
     )
+    value_number = models.IntegerField(
+        blank=True,
+        null=True,
+    )
     argument_value = models.CharField(
         max_length=255,
     )

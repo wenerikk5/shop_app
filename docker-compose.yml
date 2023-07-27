@@ -19,7 +19,3 @@ services:
   #     - discovery.type=single-node
   #   ports:
   #     - 9500:9200
-
-
-
-
