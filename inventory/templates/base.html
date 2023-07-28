@@ -14,6 +14,9 @@
     </title>
   </head>
   <body>
+    <header class="container my-2">
+      <a href="{% url 'inventory:home' %}">Home page</a>
+    </header>
     <div class="container mt-4">
         {% block content %}{% endblock %}
 

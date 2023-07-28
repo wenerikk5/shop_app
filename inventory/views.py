@@ -127,17 +127,6 @@ def product_detail(request, product_slug):
         for value in request.GET.values():
             filter_arguments.append(value)
 
-        # product = models.ProductItem.objects\
-        #     .filter(product__slug=product_slug)\
-        #     .filter(product__category__id=category_id)\
-        #     .filter(attribute_value__value__in=filter_arguments)\
-        #     .annotate(num_tags=Count('attribute_value'))\
-        #     .filter(num_tags=len(filter_arguments))\
-        #     .annotate(field_a=ArrayAgg(
-        #         'attribute_value__value')
-        #     ).values(
-        #         'id', 'sku', 'product__name', 'field_a',
-        #     )
         product = models.ProductItem.objects\
             .filter(product__slug=product_slug)\
             .filter(product__category__id=category_id)\
@@ -166,20 +155,6 @@ def product_detail(request, product_slug):
                 'id', 'sku', 'product__name', 'field_a',
             )
 
-    # y = models.ProductItem.objects\
-    #     .filter(product__slug=product_slug)\
-    #     .filter(product__category__id=category_id)\
-    #     .values(
-    #         'attribute_value__value',
-    #         'attribute_value__product_attribute__name',
-    #     ).distinct()
-
-    # z = models.Product.objects\
-    #     .filter(slug=product_slug)\
-    #     .filter(category__id=category_id)\
-    #     .values('product__attribute_value__product_attribute__name')\
-    #     .distinct()
-
     sku_values = models.Product.objects\
         .filter(slug=product_slug)\
         .filter(category__id=category_id)\
@@ -188,8 +163,6 @@ def product_detail(request, product_slug):
     context = {
         'product': product,
         'category': models.Category.objects.get(id=category_id),
-        # 'y': y,
-        # 'z': z,
         'sku_values': sku_values
     }
     return render(request, 'product_detail.html', context)

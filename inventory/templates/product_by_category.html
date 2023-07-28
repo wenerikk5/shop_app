@@ -68,6 +68,10 @@
 
             <div class="submit btn btn-primary">Filter</div>
 
+            <a class="btn btn-secondary"
+               href="{% url 'inventory:product_by_category' category_slug=category.slug %}"
+            >Reset Filters</a>
+
         </div>
 
         <div class="col-8">
@@ -106,8 +110,6 @@
         let form = document.getElementById("attrs")
         let checkboxes = document.querySelectorAll('.checkbox-attrs')
         let range_items = document.querySelectorAll('.range-attrs')
-
-        
 
         window.addEventListener('load', function(e){
             console.log('loaded');

@@ -84,41 +84,15 @@
     
 
 <script>
-    var d = {}
     let textBoxes = document.querySelectorAll('[id^=target]');
 
-    let e = 0;
-    let f = textBoxes.length;
-
-    for (let i in textBoxes) {
-        if (e < f) {
-            if (textBoxes[i].classList.contains("selected")) {
-                d[textBoxes[i].getAttribute('data-attribute')] = textBoxes[i].getAttribute("value");
-            }
-        } else {
-            break;
-        }
-        e++;
-        console.log(d);
-    }
-
     textBoxes.forEach(el => el.addEventListener('click', function(e){
-        let value = e.target.getAttribute("value")
-        d[e.target.getAttribute("data-attribute")] = value;
+        let value = e.target.getAttribute("value");
 
-        let querystring = buildUrlWithParams([value]);
         let url = window.location.href.split('?')[0];
-        window.location.href = url + '?' + querystring;
+        window.location.href = url + '?' + 'sku=' + value;
     }, false)
     );
-
-    function buildUrlWithParams(data) {
-        let searchparams = [];
-        for (let d in data) {
-            searchparams.push('sku' + '=' + data[d]);
-        }
-        return searchparams.join('&');
-    }
 
 </script>
 

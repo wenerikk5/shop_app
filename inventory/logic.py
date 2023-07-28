@@ -5,18 +5,23 @@ def filter_product(box_filter_dict, range_filter_dict, category):
     attr_names = list(box_filter_dict.keys()) + list(range_filter_dict.keys())
     print('attr_names', attr_names)
 
-    attribute_values = models.ProductAttributeValue.objects\
-        .filter(product_attribute__category=category)\
-        .filter(product_attribute__name__in=attr_names)
+    products_by_attributes = models.Product.objects\
+        .filter(category=category)
 
     for name, values in box_filter_dict.items():
-        attribute_values = attribute_values\
-            .filter(product_attribute__name=name,
-                    value__in=values)\
+        products_by_attributes = products_by_attributes\
+            .filter(product__attribute_value__product_attribute__name=name,
+                    product__attribute_value__value__in=values)\
+            .values(
+                'id',
+                'product__attribute_value__product_attribute__name',
+                'product__attribute_value__value'
+            )
 
-    attribute_values = attribute_values.values('product_item__product__id')
-
-    product_ids = set([x.get('product_item__product__id') for x in attribute_values])
+    if box_filter_dict:
+        product_ids = set([x.get('id') for x in products_by_attributes])
+    else:
+        product_ids = set([x.id for x in products_by_attributes])
 
     for name, values in range_filter_dict.items():
         attribute_values = models.ProductAttributeValue.objects\
