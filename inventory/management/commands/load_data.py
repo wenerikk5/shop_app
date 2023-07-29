@@ -2,19 +2,22 @@ import csv
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from transliterate import slugify
+import uuid
 
 from inventory.models import (
     Category,
     Product,
     ProductItem,
     ProductAttribute,
-    ProductAttributeValue
+    ProductAttributeValue,
+    ProductItemAttribute
 )
 
 
 Models = {
     # Category: 'Category.csv',
-    Product: 'Product.csv',
+    # Product: 'Product.csv',
     ProductItem: 'ProductItem.csv',
     ProductAttribute: 'ProductAttribute.csv',
     ProductAttributeValue: 'ProductAttributeValue.csv',
@@ -33,7 +36,7 @@ class Command(BaseCommand):
                 c = Category.objects.create(
                     id=row['id'],
                     name=row['name'],
-                    slug=row['slug'],
+                    slug='slug',
                     parent_id=row['parent'],
                     lft=row['lft'],
                     rght=row['rght'],
@@ -42,6 +45,24 @@ class Command(BaseCommand):
                     tree_id=row['tree_id'],
                 )
             print(f'Данные для таблицы Category успешно загружены')
+
+        with open(f'{settings.BASE_DIR}/data/Product.csv', 'r', encoding='utf-8-sig') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                name = slugify(row['name'])
+                if len(name) > 12:
+                    name = name[:12]
+                tail = str(uuid.uuid4())[:6]
+                slug = name + '-' + tail
+                p = Product.objects.create(
+                    id=row['id'],
+                    name=row['name'],
+                    slug=slug,
+                    category_id=row['category_id'],
+                    brand=row['brand'],
+                    description=row['description'],
+                )
+            print(f'Данные для таблицы Product успешно загружены')
 
         for model, csv_files in Models.items():
             with open(

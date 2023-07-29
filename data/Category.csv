@@ -1,15 +1,13 @@
-id,name,slug,parent,lft,rght,level,is_active,tree_id
-1,PC,pc,,1,14,0,True,1
-2,New,new,1,2,7,1,True,1
-3,CPU,cpu-new,2,3,4,2,True,1
-4,Motherboard,mobo-new,2,5,6,2,True,1
-5,Used,used,1,8,13,1,True,1
-6,CPU,cpu-used,5,9,10,2,True,1
-7,Motherboard,mobo-used,5,11,12,2,True,1
-8,Clothes,clothes,,15,28,0,True,1
-9,Shoes,shoes,8,16,21,1,True,1
-10,Regular,regular,9,17,18,2,True,1
-11,Sport,sport,9,19,20,2,True,1
-12,Others,others,8,22,27,1,True,1
-13,Jeans,jeans,12,23,24,2,True,1
-14,T-shirt,t-shirt,12,25,26,2,True,1
+﻿id,name,parent,lft,rght,level,is_active,tree_id
+1,Компьютеры и комплектующие,,1,14,0,True,1
+2,Моноблоки,1,2,3,1,True,1
+3,Комплектующие для ПК,1,4,13,1,True,1
+4,Видеокарты,3,5,6,2,True,1
+5,Процессоры,3,7,8,2,True,1
+6,Материнские платы,3,9,10,2,True,1
+7,Модули памяти,3,11,12,2,True,1
+8,Ноутбуки,,15,16,0,True,1
+9,Смартфоны и гаджеты,,17,22,0,True,1
+10,Смартфоны,9,18,19,1,True,1
+11,Умные часы и браслеты,9,20,21,1,True,1
+12,Умные колонки,,23,24,0,True,1

@@ -4,6 +4,9 @@ from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey,\
     TreeManyToManyField
 
+from transliterate import slugify
+import uuid
+
 
 class Category(MPTTModel):
     name = models.CharField(
@@ -36,6 +39,15 @@ class Category(MPTTModel):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        name = slugify(self.name)
+        if len(name) > 30:
+            name = name[:30]
+        tail = str(uuid.uuid4())[:6]
+
+        self.slug = name + '-' + tail
+        return super().save(*args, **kwargs)
+
 
 class Product(models.Model):
     slug = models.SlugField(
@@ -46,16 +58,27 @@ class Product(models.Model):
         Category,
         on_delete=models.PROTECT,
     )
+    brand = models.CharField(
+        max_length=100,
+        null=False,
+        blank=False,
+    )
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        name = slugify(self.name)
+        if len(name) > 20:
+            name = name[:20]
+        tail = str(uuid.uuid4())[:6]
+
+        self.slug = name + '-' + tail
+        return super().save(*args, **kwargs)
+
 
 class ProductItem(models.Model):
-    # slug = models.SlugField(
-    #     max_length=200,
-    # )
     sku = models.CharField(
         max_length=20,
         unique=True,
@@ -70,6 +93,10 @@ class ProductItem(models.Model):
         through='ProductItemAttribute',
         related_name='product_item',
     )
+    price = models.IntegerField(
+        null=False,
+        blank=False,
+    )
     # created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -79,12 +106,21 @@ class ProductItem(models.Model):
 class ProductAttribute(models.Model):
     name = models.CharField(
         max_length=255,
-        # unique=True,
+        db_index=True,
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
         related_name='product_attribute'
+    )
+    filtered = models.BooleanField(
+        default=False,
+        null=False,
+        blank=False
+    )
+    filter_type = models.CharField(
+        max_length=20,
+        default='checkbox'
     )
 
     def __str__(self):
@@ -95,36 +131,33 @@ class ProductAttributeValue(models.Model):
     product_attribute = models.ForeignKey(
         ProductAttribute,
         on_delete=models.PROTECT,
-        related_name='product_attribute'
+        related_name='product_attribute_values'
     )
     value = models.CharField(
         max_length=200,
+        db_index=True,
     )
-    value_number = models.IntegerField(
+    value_number = models.FloatField(
         blank=True,
         null=True,
     )
-    argument_value = models.CharField(
-        max_length=255,
-    )
 
-    # def __str__(self):
-    #     return self.id
+    def __str__(self):
+        return f'id: {self.id}, value: {self.value}'
 
     def save(self, *args, **kwargs):
-        self.argument_value = f'{self.product_attribute.name}:{self.value}'
         return super().save(*args, **kwargs)
 
 
 class ProductItemAttribute(models.Model):
     product_item = models.ForeignKey(
         ProductItem,
-        related_name='product_item',
+        related_name='productItem',
         on_delete=models.PROTECT,
     )
     product_attribute_value = models.ForeignKey(
         ProductAttributeValue,
-        related_name='product_attribute_value',
+        related_name='productAttributeValue',
         on_delete=models.PROTECT,
     )
 

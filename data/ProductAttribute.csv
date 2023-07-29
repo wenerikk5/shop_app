@@ -1,17 +1,41 @@
-id,category_id,name
-1,3,brand
-2,4,brand
-3,6,brand
-4,7,brand
-5,10,brand
-6,11,brand
-7,13,brand
-8,14,brand
-9,3,threads
-10,6,threads
-11,10,size
-12,11,size
-13,13,size
-14,14,size
-15,3,frequency
-16,6,frequency
+﻿id,category_id,name,filtered,filter_type
+1,2,диагональ экрана,True,range
+2,2,разрешение экрана,True,checkbox
+3,2,процессор,False,checkbox
+4,2,накопитель,True,checkbox
+5,2,название видеокарты,False,checkbox
+6,2,беспроводные интерфейсы,False,checkbox
+7,2,объем оперативной памяти,True,checkbox
+8,4,объем видеопамяти,True,checkbox
+9,4,тип памяти,True,checkbox
+10,4,частота памяти,False,checkbox
+11,4,шина обмена с памятью,True,checkbox
+12,4,частота видеопроцессора,False,checkbox
+13,4,разъемы и интерфейсы,False,checkbox
+14,4,максимальное разрешение,False,checkbox
+15,4,тип подключения,False,checkbox
+16,4,техпроцесс,False,checkbox
+17,5,сокет,True,checkbox
+18,5,количество ядер,True,checkbox
+19,5,частота,True,checkbox
+20,5,объем кэша L2/L3,False,checkbox
+21,5,оперативная память,False,checkbox
+22,5,тепловыделение,False,checkbox
+23,5,техпроцесс,True,checkbox
+24,5,ядро процессора,True,checkbox
+25,6,сокет,True,checkbox
+26,6,форм-фактор,True,checkbox
+27,6,чипсет,True,checkbox
+28,6,тип памяти,True,checkbox
+29,6,максимальная частота памяти,True,checkbox
+30,6,поддержка PCI Express,False,checkbox
+31,6,беспроводные интерфейсы,False,checkbox
+32,6,разъемы на задней панели,False,checkbox
+33,10,Конфигурация памяти,False,checkbox
+34,10,color,False,checkbox
+35,10,экран,True,range
+36,10,аккумулятор,False,checkbox
+37,10,процессор,True,checkbox
+38,10,операционная система,True,checkbox
+39,10,стандарт связи,False,checkbox
+40,10,вес,False,checkbox

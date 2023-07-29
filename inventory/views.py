@@ -94,10 +94,11 @@ def product_by_category(request, category_slug):
             )
 
     category_attrs = models.ProductAttribute.objects.filter(
-        category=category)
+        category=category, filtered=True)
 
     attr_values = models.ProductAttributeValue.objects\
         .filter(product_attribute__category__id=category.id)\
+        .filter(product_attribute__filtered=True)\
         .values(
             'value',
             'product_attribute__name',
@@ -121,7 +122,11 @@ def product_by_category(request, category_slug):
 def product_detail(request, product_slug):
     filter_arguments = []
 
-    category_id = models.Product.objects.filter(slug=product_slug).first().category.id
+    print('=====product slug:', product_slug)
+
+    category_id = models.Product.objects\
+        .filter(slug=product_slug)\
+        .first().category.id
 
     if request.GET:
         for value in request.GET.values():
@@ -197,4 +202,3 @@ def add_product(request):
         print('=====New Product is added')
         return redirect('inventory:categories')
     return render(request, 'add_product.html', {'form': form})
-
