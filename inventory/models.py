@@ -41,8 +41,8 @@ class Category(MPTTModel):
 
     def save(self, *args, **kwargs):
         name = slugify(self.name)
-        if len(name) > 30:
-            name = name[:30]
+        if len(name) > 50:
+            name = name[:50]
         tail = str(uuid.uuid4())[:6]
 
         self.slug = name + '-' + tail
@@ -70,8 +70,8 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         name = slugify(self.name)
-        if len(name) > 20:
-            name = name[:20]
+        if len(name) > 30:
+            name = name[:30]
         tail = str(uuid.uuid4())[:6]
 
         self.slug = name + '-' + tail
@@ -163,3 +163,33 @@ class ProductItemAttribute(models.Model):
 
     class Meta:
         unique_together = (("product_attribute_value", "product_item"),)
+
+
+class ProductMedia(models.Model):
+    img_url = models.ImageField(upload_to='product/%Y/%m/%d',
+                                blank=True, null=True)
+    product_item = models.ForeignKey(
+        ProductItem,
+        on_delete=models.CASCADE,
+    )
+    alt_text = models.CharField(default='Product images')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Product image id={self.id}'
+
+
+class CategoryMedia(models.Model):
+    img_url = models.ImageField(upload_to='category/%Y/%m/%d',
+                                blank=True, null=True)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+    )
+    alt_text = models.CharField(default='Category image')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Category image id={self.id}'

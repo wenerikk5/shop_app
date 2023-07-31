@@ -9,11 +9,58 @@
         <div class="aside col-4 border">
             <h3>Category Attrs</h3>
             <ul>
+                <li>
+                    Цена, руб.
+                </li>
+                    <div class="input-group">
+                        <input
+                            class="price-attrs form-control rounded"
+                            name="price-min"
+                            {% if price_dict|from_dict:'price'|from_list:0 %}
+                                value="{{ price_dict|from_dict:'price'|from_list:0 }}"
+                            {% else %}
+                                value=""
+                            {% endif %}
+                            placeholder="от"
+                        >
+                        <input
+                            class="price-attrs form-control mx-1 rounded"
+                            name="price-max"
+                            {% if price_dict|from_dict:'price'|from_list:1 %}
+                                value="{{ price_dict|from_dict:'price'|from_list:1 }}"
+                            {% else %}
+                                value=""
+                            {% endif %}
+                            placeholder="до"
+                        >
+                    </div>
+                    <br>
+
+                <li>
+                    Производитель
+                </li>
+                    {% for brand in brands %}
+                        {% with 'brand'|addstr:brand.brand as value %}
+                        <input 
+                            class="brand-attrs"
+                            type="checkbox"
+                            name="{{ value }}"
+                            value="{{ value }}"
+                            {% if brand.brand in brand_dict.brand %}
+                                checked
+                            {% else %}
+                            {% endif %}
+                        >
+                        <label for="{{ value }}">{{ brand.brand }}</label><br>
+                        {% endwith %}
+                    {% endfor %}
+                    <br>
+
                 {% for attr in category_attrs %}
                 <li>
                    {{ attr.name }}:
                 </li>
-                    {% if attr.name in INPUT_TYPE_RANGE %}
+                    {% if attr.filter_type == 'range' %}
                         <div class="input-group">
                             {% with attr.name as name %}
                             <input
@@ -24,7 +71,7 @@
                                 {% else %}
                                     value=""
                                 {% endif %}
-                                placeholder="min value"
+                                placeholder="от"
                             >
                             <input
                                 class="range-attrs form-control mx-1 rounded"
@@ -34,11 +81,14 @@
                                 {% else %}
                                     value=""
                                 {% endif %}
-                                placeholder="max value"
+                                placeholder="до"
                             >
                             {% endwith %}
                         </div>
+                        <br>
+
                     {% else %}
+
                     {% for val in attr_values %}
                     {% if val.product_attribute__name == attr.name %}
                         {% with attr.name|addstr:val.value as value %}
@@ -48,7 +98,7 @@
                             type="checkbox"
                             name="{{ value }}"
                             value="{{ value }}"
-                            {% if value in box_arguments %}
+                            {% if value in checkbox_arguments %}
                             checked
                             {% else %}
                             {% endif %}
@@ -57,6 +107,8 @@
                         {% endwith %}
                     {% endif %}
                     {% endfor %}
+                    <br>
+
                     {% endif %}
 
                 {% endfor %}
@@ -110,43 +162,66 @@
         let form = document.getElementById("attrs")
         let checkboxes = document.querySelectorAll('.checkbox-attrs')
         let range_items = document.querySelectorAll('.range-attrs')
-
-        window.addEventListener('load', function(e){
-            console.log('loaded');
-        })
+        let price_items = document.querySelectorAll('.price-attrs')
+        let brand_items = document.querySelectorAll('.brand-attrs')
 
         submit.addEventListener('click', function(e){
             let args1 = document.createElement("input");
             let args2 = document.createElement("input");
-            let box_attrs = [];
+            let args3 = document.createElement("input");
+            let args4 = document.createElement("input");
+
+            let checkbox_attrs = [];
+            let range_attrs = [];
+            let price_attrs = [];
+            let brand_attrs = [];
 
             checkboxes.forEach(function(box){
                 if (box.checked == true) {
-                    box_attrs.push(box.value);
+                    checkbox_attrs.push(box.value);
                 };
             });
 
-            let range_attrs = [];
+            brand_items.forEach(function(box){
+                if (box.checked == true) {
+                    brand_attrs.push(box.value);
+                };
+            });
+            
             range_items.forEach(function(item){
                 if (item.value != '') {
                     range_attrs.push(item.name + ':' + item.value);
                 } 
             });
-
-            console.log(range_attrs);
+            
+            price_items.forEach(function(item){
+                if (item.value != '') {
+                    price_attrs.push(item.name + ':' + item.value);
+                } 
+            });
             
             args1.setAttribute("type", "hidden");
-            args1.setAttribute("name", "box_attrs");
-            args1.setAttribute("value", box_attrs.join('&'));
+            args1.setAttribute("name", "checkbox_attrs");
+            args1.setAttribute("value", checkbox_attrs.join('&'));
 
             args2.setAttribute("type", "hidden");
             args2.setAttribute("name", "range_attrs");
             args2.setAttribute("value", range_attrs.join('&'));
 
+            args3.setAttribute("type", "hidden");
+            args3.setAttribute("name", "price_attrs");
+            args3.setAttribute("value", price_attrs.join('&'));
+
+            args4.setAttribute("type", "hidden");
+            args4.setAttribute("name", "brand_attrs");
+            args4.setAttribute("value", brand_attrs.join('&'));
+
             form.appendChild(args1);
             form.appendChild(args2);
+            form.appendChild(args3);
+            form.appendChild(args4);
 
-            console.log(form);
+            //console.log(form);
             $('body').append(form);
             form.submit();
         });
