@@ -62,7 +62,9 @@ def filter_products(checkbox_filter_dict, range_filter_dict, brand_dict,
             'category__name',
             'product__price',
             'description',
-        )
+            'product__media',
+            'product__media__img_url',
+        ).distinct('id')
     if brand_dict:
         products = products.filter(brand__in=brand_dict.get('brand'))
     if price_dict.get('price', [0, 0])[0]:

@@ -1,66 +1,25 @@
 {% extends 'base.html' %}
+{% load static %}
 
 
 {% block content %}
+{% load custom_tags %}
+{% load thumbnail %}
 
 <div class="row">
         
-    <div class="aside col-4 border">
-        <h4>Model sku:</h4>
-        <ul> 
-        {% comment %} {% for attr in z %}
-        <li>
-            {{ attr.product__attribute_value__product_attribute__name }}
-            <ul>
-                {% for a in y %}
-                    {% if attr.product__attribute_value__product_attribute__name == a.attribute_value__product_attribute__name %}
-                        {% if a.attribute_value__value in product.0.field_a %}
-                            <li id="target-{{ a.attribute_value__value }}"
-                                class="selected fw-bold"
-                                data-attribute="{{ attr.product_attribute__name }}"
-                                value="{{ a.attribute_value__value }}"
-                            >
-                                {{ a.attribute_value__value }}
-                            </li>
-                        {% else %}
-                            <li id="target-{{ a.attribute_value__value }}" 
-                                class=""
-                                data-attribute="{{ attr.product__attribute_value__product_attribute__name }}"
-                                value="{{ a.attribute_value__value }}"
-                            >
-                                {{ a.attribute_value__value }}
-                            </li>
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </li>
-        {% endfor %}  {% endcomment %}
+    <div class="aside col-3 border">
 
+        {% if product.0.media %}
+            <img src="{% thumbnail product.0.media__img_url 150x150 crop %}" class="rounded">
+        {% else %}
+            <img src="{% thumbnail 'no_image.png' 150x150 crop %}" class="rounded">
+        {% endif %}
         
-        {% for p in sku_values %}
-            {% if p.product__sku in product.0.field_a %}
-                <li id="target-{{ p.product__sku }}"
-                    class="selected fw-bold"
-                    data-attribute="sku"
-                    value="{{ p.product__sku }}"
-                >
-                    {{ p.product__sku }}
-                </li>
-            {% else %}
-                <li id="target-{{ p.product__sku }}" 
-                    class=""
-                    data-attribute="sku"
-                    value="{{ p.product__sku }}"
-                >
-                    {{ p.product__sku }}
-                </li>
-            {% endif %}
-        {% endfor %}
-    </ul>
     </div>
     
-    <div class="col-8">
+    <div class="col-6">
+        <!-- Root navigation -->
         <div class="tree mb-2">
             {% for ancestor in category.get_ancestors %}
                 <a  href="{% url 'inventory:category' category_slug=ancestor.slug %}"
@@ -72,17 +31,53 @@
             >{{ category.name }}</a>
         </div>
 
-        <h1>Product model</h1>
-        <ul>
-            <li class="fw-bold">
-                {{ product.0.product__name }}<br>
-                sku: {{ product.0.sku }}<br>
-                {% comment %} {{ product.0.product_inventory__units }} pcs. {% endcomment %}
-            </li>
-        </ul> 
-    </div>
-    
+        <h1 class="">{{ product.0.product__name }}</h1>
 
+        <div class="mb-3">
+            <p class='fs-6 fw-medium mb-2'>Модификации продукта:</p>
+            {% for p in sku_values %}
+                {% if p.product__sku in product.0.field_a %}
+                    <li id="target-{{ p.product__sku }}"
+                        class="btn btn-outline-warning text-dark"
+                        data-attribute="sku"
+                        value="{{ p.product__sku }}"
+                    >
+                        {{ p.product__sku }}
+                    </li>
+                {% else %}
+                    <li id="target-{{ p.product__sku }}" 
+                        class="btn btn-light"
+                        data-attribute="sku"
+                        value="{{ p.product__sku }}"
+                    >
+                        {{ p.product__sku }}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if product.0.product__description %}
+        <h3>Описание</h3>
+        <p>{{ product.0.product__description }}</p>
+        {% endif %}
+        <h3>Характеристики</h3>
+        <table class="table">
+            <tbody>
+                {% for a in attrs %}
+                <tr> 
+                    <td>{{ a.attribute_value__product_attribute__name|capfirst }}</td>
+                    <td>{{ a.attribute_value__value }}</td>              
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+    </div>
+
+    <div class="col-3 border">
+    
+    </div>
+</div>
 <script>
     let textBoxes = document.querySelectorAll('[id^=target]');
 

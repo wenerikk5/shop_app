@@ -1,18 +1,74 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Categories</h1>
-    <ul>
-    {% for category in data %}
-        <li>
-            {% if category.get_children %}
-                <a href="{% url 'inventory:category' category_slug=category.slug %}">{{ category.name }}</a>
-            {% else %}
-                <a href="{% url 'inventory:product_by_category' category_slug=category.slug %}">{{ category.name }}</a>
-            {% endif %}
-        </li>
+{% load thumbnail %}
 
-    {% endfor %}
-    </ul>
+<div class="row">
+            
+    <div class="aside col-3 border">
+        {% if categories.0.get_ancestors.1 %}
+            <a href="{% url 'inventory:category' category_slug=categories.0.get_ancestors.0.slug %}" class="text-decoration-none text-dark">
+                {{ categories.0.get_ancestors.0.name }}
+            <a>
+        {% else %}
+            <a href="{% url 'inventory:categories' %}" class="text-decoration-none text-dark">
+                Все категории
+            <a>
+        {% endif %}
+
+        <h1>Категории</h1>
+
+        <ul>
+            {% for category in categories %}
+                <li {% if category.get_children %}class="fw-semibold"{% endif %}>
+                    {% if category.get_children %}
+                        <a href="{% url 'inventory:category' category_slug=category.slug %}" class="text-decoration-none text-dark">
+                    {% else %}
+                        <a href="{% url 'inventory:product_by_category' category_slug=category.slug %}" class="text-decoration-none text-dark">
+                    {% endif %}
+                        {{ category.name }}
+                    </a>
+                </li>
+                <ul>
+                    {% for child in category.get_children %}
+                        <li>
+                            {% if child.get_children %}
+                                <a href="{% url 'inventory:category' category_slug=child.slug %}" class="text-decoration-none text-dark">
+                            {% else %}
+                                <a href="{% url 'inventory:product_by_category' category_slug=child.slug %}" class="text-decoration-none text-dark">
+                            {% endif %}
+                            {{ child.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <br>
+            {% endfor %}
+        </ul>
+
+    </div>
+
+    <div class="col-9">
+        <br>
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            {% for category in categories %}
+                <div class="col">
+                    {% if category.get_children %}
+                        <a href="{% url 'inventory:category' category_slug=category.slug %}" class="text-decoration-none">
+                    {% else %}
+                        <a href="{% url 'inventory:product_by_category' category_slug=category.slug %}" class="text-decoration-none">
+                    {% endif %}
+                    <div class="card h-100 border-0">
+                        <img src="{% thumbnail category.img_url|default:'no_image.png' 200x200 crop %}" class="rounded-4">
+                        <div class="card-body pt-1">
+                            <p class="fs-5 fw-medium text-center">{{ category.name }}</p>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 
 {%endblock%}

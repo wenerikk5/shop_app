@@ -28,6 +28,8 @@ class Category(MPTTModel):
         blank=True,
         unique=False,
     )
+    img_url = models.ImageField(upload_to='category/%Y/%m/%d',
+                                blank=True, null=True)
 
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -166,30 +168,16 @@ class ProductItemAttribute(models.Model):
 
 
 class ProductMedia(models.Model):
-    img_url = models.ImageField(upload_to='product/%Y/%m/%d',
+    img_url = models.ImageField(upload_to='product/%Y/%m/%d/',
                                 blank=True, null=True)
     product_item = models.ForeignKey(
         ProductItem,
         on_delete=models.CASCADE,
+        related_name='media'
     )
-    alt_text = models.CharField(default='Product images')
+    alt_text = models.CharField(max_length=50, default='Product images')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'Product image id={self.id}'
-
-
-class CategoryMedia(models.Model):
-    img_url = models.ImageField(upload_to='category/%Y/%m/%d',
-                                blank=True, null=True)
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-    )
-    alt_text = models.CharField(default='Category image')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f'Category image id={self.id}'

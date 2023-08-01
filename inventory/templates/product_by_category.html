@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
-
+{% load static %}
 
 {% block content %}
 {% load custom_tags %}
+{% load thumbnail %}
 
     <div class="row">
         
-        <div class="aside col-4 border">
+        <div class="aside col-3 border">
             <h3>Category Attrs</h3>
             <ul>
-                <li>
+                <li class="fw-bolder">
                     Цена, руб.
                 </li>
                     <div class="input-group">
@@ -36,7 +37,7 @@
                     </div>
                     <br>
 
-                <li>
+                <li class="fw-bolder">
                     Производитель
                 </li>
                     {% for brand in brands %}
@@ -57,8 +58,8 @@
                     <br>
 
                 {% for attr in category_attrs %}
-                <li>
-                   {{ attr.name }}:
+                <li class="fw-bolder">
+                   {{ attr.name|capfirst }}
                 </li>
                     {% if attr.filter_type == 'range' %}
                         <div class="input-group">
@@ -126,7 +127,7 @@
 
         </div>
 
-        <div class="col-8">
+        <div class="col-9">
             <div class="tree mb-2">
                 {% for ancestor in category.get_ancestors %}
                     <a  href="{% url 'inventory:category' category_slug=ancestor.slug %}"
@@ -138,18 +139,22 @@
                 >{{ category.name }}</a>
             </div>
 
-            <h1>Products</h1>
-            <h2><small>in</small> {{ category.name }}</h2>
-            <ul>
+            <h1 class="my-3">{{ category.name }}</h1>
+            <div class="row row-cols-1 row-cols-md-4 g-4">
             {% for product in products %}
-                <li>
-                    <a href="{% url "inventory:product_detail" product_slug=product.slug %}">{{ product.name }}</a><br>
-                    {{ product.id }}<br>
-                    {{ product.description }}
-                    {% comment %} Price: ${{ product.product__store_price }} ({{product.product__product_inventory__units}} pcs.) {% endcomment %}
-                </li>
+                <div class="col">
+                    <a href="{% url "inventory:product_detail" product_slug=product.slug %}" class="text-decoration-none">
+                    <div class="card h-100 px-0 py-0">
+                        <img src="{% thumbnail product.product__media__img_url|default:'no_image.png' 200x200 crop %}" class="rounded-top">
+                        <div class="card-body">
+                            <h6>{{ product.name }}</h6>
+                            <p>{{ product.description|truncatechars:50 }}</p> 
+                        </div>
+                    </div>
+                    </a>
+                </div>
             {% endfor %}
-            </ul>
+            </div>
 
         </div>
 

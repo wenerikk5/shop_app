@@ -9,6 +9,7 @@ from inventory.models import (
     Category,
     Product,
     ProductItem,
+    ProductMedia,
     ProductAttribute,
     ProductAttributeValue,
     ProductItemAttribute
@@ -19,6 +20,7 @@ Models = {
     # Category: 'Category.csv',
     # Product: 'Product.csv',
     ProductItem: 'ProductItem.csv',
+    ProductMedia: 'ProductMedia.csv',
     ProductAttribute: 'ProductAttribute.csv',
     ProductAttributeValue: 'ProductAttributeValue.csv',
     ProductItem.attribute_value.through: 'ProductItemAttribute.csv',
@@ -43,6 +45,7 @@ class Command(BaseCommand):
                     level=row['level'],
                     is_active=row['is_active'],
                     tree_id=row['tree_id'],
+                    img_url=row['img_url'],
                 )
             print(f'Данные для таблицы Category успешно загружены')
 

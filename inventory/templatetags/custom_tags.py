@@ -1,4 +1,6 @@
 from django import template
+from django.conf import settings
+from pathlib import Path
 
 
 register = template.Library()
@@ -22,3 +24,11 @@ def from_list(d, key):
     except:
         val = []
     return val
+
+
+@register.filter
+def get_url(media_path):
+    if media_path:
+        return '/media/' + media_path
+    else:
+        return ''

@@ -16,19 +16,21 @@ def home(request):
 
 
 def categories(request):
-    data = models.Category.objects.filter(level=0).all()
+    categories = models.Category.objects.filter(level=0).all()
 
     return render(request, 'category.html',
-                  {'data': data})
+                  {'categories': categories})
 
 
 def category(request, category_slug):
-    data = get_object_or_404(models.Category, slug=category_slug).get_children()
+    categories = get_object_or_404(models.Category, slug=category_slug).get_children()
 
     # print(TreeNodeChoiceField(queryset=models.Category.objects.all()))
 
-    return render(request, 'category.html',
-                  {'data': data})
+    context = {
+        'categories': categories,
+    }
+    return render(request, 'category.html', context)
 
 
 def product_by_category(request, category_slug):
@@ -98,9 +100,13 @@ def product_by_category(request, category_slug):
                 'id',
                 'name',
                 'slug',
+                'brand',
                 'category__name',
+                'product__price',
                 'description',
-            )
+                'product__media',
+                'product__media__img_url',
+            ).distinct('id')
 
     # all attributes for certain category (list in filters)
     category_attrs = models.ProductAttribute.objects.filter(
@@ -142,52 +148,83 @@ def product_by_category(request, category_slug):
 def product_detail(request, product_slug):
     filter_arguments = []
 
-    print('=====product slug:', product_slug)
-
     category_id = models.Product.objects\
         .filter(slug=product_slug)\
         .first().category.id
-
-    if request.GET:
-        for value in request.GET.values():
-            filter_arguments.append(value)
-
-        product = models.ProductItem.objects\
-            .filter(product__slug=product_slug)\
-            .filter(product__category__id=category_id)\
-            .filter(sku__in=filter_arguments)\
-            .annotate(field_a=ArrayAgg(
-                'sku')
-            ).values(
-                'id', 'sku', 'product__name', 'field_a',
-            )
-        if len(product) < 1:
-            product = models.ProductItem.objects\
-                .filter(product__slug=product_slug)\
-                .filter(product__category__id=category_id)\
-                .annotate(field_a=ArrayAgg(
-                    'sku')
-                ).values(
-                    'id', 'sku', 'product__name', 'field_a',
-                )
-    else:
-        product = models.ProductItem.objects\
-            .filter(product__slug=product_slug)\
-            .filter(product__category__id=category_id)\
-            .annotate(field_a=ArrayAgg(
-                'sku')
-            ).values(
-                'id', 'sku', 'product__name', 'field_a',
-            )
 
     sku_values = models.Product.objects\
         .filter(slug=product_slug)\
         .filter(category__id=category_id)\
         .values('product__sku')
 
+    print('sku_values:', sku_values[0].get('product__sku'))    
+
+    if request.GET:
+        for value in request.GET.values():
+            filter_arguments.append(value)
+        print('filter_args:', filter_arguments)
+
+        product = models.ProductItem.objects\
+            .filter(product__slug=product_slug)\
+            .filter(product__category__id=category_id)\
+            .filter(sku__in=filter_arguments)\
+            .annotate(field_a=ArrayAgg('sku'))\
+            .values(
+                'id',
+                'sku',
+                'product__name',
+                'product__description',
+                'field_a',
+                'media',
+                'media__img_url',
+            )
+        attrs = models.ProductItem.objects\
+            .filter(sku__in=filter_arguments)\
+            .values(
+                'attribute_value__value',
+                'attribute_value__product_attribute__name'
+            )
+        print('===attrs:', attrs)
+        if len(product) < 1:
+            product = models.ProductItem.objects\
+                .filter(product__slug=product_slug)\
+                .filter(product__category__id=category_id)\
+                .annotate(field_a=ArrayAgg('sku'))\
+                .values(
+                    'id',
+                    'sku',
+                    'product__name',
+                    'product__description',
+                    'field_a',
+                    'media',
+                    'media__img_url',
+                )
+
+    else:
+        product = models.ProductItem.objects\
+            .filter(product__slug=product_slug)\
+            .filter(product__category__id=category_id)\
+            .annotate(field_a=ArrayAgg('sku'))\
+            .values(
+                'id',
+                'sku',
+                'product__name',
+                'product__description',
+                'field_a',
+                'media',
+                'media__img_url',
+            )
+        attrs = models.ProductItem.objects\
+            .filter(sku__in=[sku_values[0].get('product__sku')])\
+            .values(
+                'attribute_value__value',
+                'attribute_value__product_attribute__name'
+            )
+
     context = {
         'product': product,
         'category': models.Category.objects.get(id=category_id),
+        'attrs': attrs,
         'sku_values': sku_values
     }
     return render(request, 'product_detail.html', context)
