@@ -8,8 +8,8 @@
     <div class="row">
         
         <div class="aside col-3 border">
-            <h3>Category Attrs</h3>
-            <ul>
+            <h3> </h3>
+            <ul class="px-3">
                 <li class="fw-bolder">
                     Цена, руб.
                 </li>
@@ -130,7 +130,7 @@
         <div class="col-9">
             <div class="tree mb-2">
                 {% for ancestor in category.get_ancestors %}
-                    <a  href="{% url 'inventory:category' category_slug=ancestor.slug %}"
+                    <a  href="{{ ancestor.get_absolute_url }}"
                         class="badge bg-light text-secondary border text-decoration-none"
                     >{{ ancestor.name }}</a><span class="text-secondary"> / </span>
                 {% endfor %}
@@ -143,20 +143,28 @@
             <div class="row row-cols-1 row-cols-md-4 g-4">
             {% for product in products %}
                 <div class="col">
-                    <a href="{% url "inventory:product_detail" product_slug=product.slug %}" class="text-decoration-none">
+                    
                     <div class="card h-100 px-0 py-0">
-                        <img src="{% thumbnail product.product__media__img_url|default:'no_image.png' 200x200 crop %}" class="rounded-top">
+                        <a href="{% url 'inventory:product_detail' product_slug=product.slug %}" class="text-decoration-none">
+                            <img src="{{ product.product__media__img_url|get_url }}" class="card-img-top" alt="...">
+                        </a>
                         <div class="card-body">
                             <h6>{{ product.name }}</h6>
-                            <p>{{ product.description|truncatechars:50 }}</p> 
                         </div>
+                        <div class="card-footer px-0 py-0">
+                            <a href="#" class="btn btn-warning btn-my-xl fw-medium align-bottom">В корзину</a>
+                        </div>
+
                     </div>
-                    </a>
+                    
+                    
                 </div>
+                
             {% endfor %}
             </div>
 
         </div>
+        
 
     </div>
 

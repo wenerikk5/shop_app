@@ -7,7 +7,7 @@
             
     <div class="aside col-3 border">
         {% if categories.0.get_ancestors.1 %}
-            <a href="{% url 'inventory:category' category_slug=categories.0.get_ancestors.0.slug %}" class="text-decoration-none text-dark">
+            <a href="{{ categories.0.get_ancestors.0.get_absolute_url }}" class="text-decoration-none text-dark">
                 {{ categories.0.get_ancestors.0.name }}
             <a>
         {% else %}
@@ -18,11 +18,11 @@
 
         <h1>Категории</h1>
 
-        <ul>
+        <ul class="">
             {% for category in categories %}
                 <li {% if category.get_children %}class="fw-semibold"{% endif %}>
                     {% if category.get_children %}
-                        <a href="{% url 'inventory:category' category_slug=category.slug %}" class="text-decoration-none text-dark">
+                        <a href="{{ category.get_absolute_url }}" class="text-decoration-none text-dark">
                     {% else %}
                         <a href="{% url 'inventory:product_by_category' category_slug=category.slug %}" class="text-decoration-none text-dark">
                     {% endif %}
@@ -33,7 +33,7 @@
                     {% for child in category.get_children %}
                         <li>
                             {% if child.get_children %}
-                                <a href="{% url 'inventory:category' category_slug=child.slug %}" class="text-decoration-none text-dark">
+                                <a href="{{ child.get_absolute_url }}" class="text-decoration-none text-dark">
                             {% else %}
                                 <a href="{% url 'inventory:product_by_category' category_slug=child.slug %}" class="text-decoration-none text-dark">
                             {% endif %}
@@ -54,13 +54,13 @@
             {% for category in categories %}
                 <div class="col">
                     {% if category.get_children %}
-                        <a href="{% url 'inventory:category' category_slug=category.slug %}" class="text-decoration-none">
+                        <a href="{{ category.get_absolute_url }}" class="text-decoration-none">
                     {% else %}
                         <a href="{% url 'inventory:product_by_category' category_slug=category.slug %}" class="text-decoration-none">
                     {% endif %}
                     <div class="card h-100 border-0">
                         <img src="{% thumbnail category.img_url|default:'no_image.png' 200x200 crop %}" class="rounded-4">
-                        <div class="card-body pt-1">
+                        <div class="card-img-overlay pt-1">
                             <p class="fs-5 fw-medium text-center">{{ category.name }}</p>
                         </div>
                     </div>

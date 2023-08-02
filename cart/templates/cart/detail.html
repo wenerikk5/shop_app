@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Your shopping cart
+{% endblock %}
+{% block content %}
+{% load custom_tags %}
+{% load thumbnail %}
+  <h1>Your shopping cart</h1>
+  <table class="table table-hover">
+    <thead class="table-success"> 
+    <tr>
+        <th>Image</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Remove</th>
+        <th>Unit price</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in cart %}
+        {% with product=item.product %}
+          <tr>
+            <td>
+              <a href="{{ product.get_absolute_url }}">
+                <img src="{% thumbnail product.id|get_product_image_thumb 150x150 crop %}" class="rounded">
+              </a>
+            </td>
+            <td>{{ product.get_name }}</td>
+            <td>
+              <form action="{% url 'cart:cart_add' product.sku %}" method="post">
+                {{ item.update_quantity_form.quantity }}
+                {{ item.update_quantity_form.override }}
+                <input type="submit" value="Update" class="btn btn-secondary btn-sm">
+                {% csrf_token %}
+              </form>
+            </td>
+            <td>
+                <form action="{% url "cart:cart_remove" product.id %}" method="post">
+                    <input type="submit" value="Remove" class="btn btn-secondary btn-sm">
+                    {% csrf_token %}
+                </form>
+            </td>
+            <td class="num">₽ {{ item.price|delimiter }}</td>
+            <td class="num">₽ {{ item.total_price|delimiter }}</td>
+          </tr>
+        {% endwith %}
+      {% endfor %}
+      <tr class="table-success">
+        <td>Total</td>
+        <td colspan="4"></td>
+        <td class="num">₽ {{ cart.get_total_price|delimiter }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="d-flex flex-row-reverse">
+    <a href="#" class="btn btn-success">Checkout</a>
+    <a href="{% url "inventory:categories" %}" class="btn btn-light mx-3">Continue shopping</a>
+  </div>
+{% endblock %}

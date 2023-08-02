@@ -1,5 +1,6 @@
 from typing import Iterable, Optional
 from django.db import models
+from django.urls import reverse
 
 from mptt.models import MPTTModel, TreeForeignKey,\
     TreeManyToManyField
@@ -50,6 +51,10 @@ class Category(MPTTModel):
         self.slug = name + '-' + tail
         return super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse("inventory:category",
+                       kwargs={"category_slug": self.slug})
+
 
 class Product(models.Model):
     slug = models.SlugField(
@@ -79,6 +84,10 @@ class Product(models.Model):
         self.slug = name + '-' + tail
         return super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse("inventory:product_detail",
+                       kwargs={"product_slug": self.slug})
+
 
 class ProductItem(models.Model):
     sku = models.CharField(
@@ -95,14 +104,32 @@ class ProductItem(models.Model):
         through='ProductItemAttribute',
         related_name='product_item',
     )
-    price = models.IntegerField(
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
         null=False,
         blank=False,
     )
     # created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['sku']
+        indexes = [
+            models.Index(fields=['sku']),
+        ]
+
     def __str__(self):
         return f'Product item sku={self.sku}'
+
+    def get_slug(self):
+        return Product.objects.filter(product__sku=self.sku)[0].slug
+
+    def get_name(self):
+        return Product.objects.filter(product__sku=self.sku)[0].name
+
+    def get_absolute_url(self):
+        return reverse("inventory:product_detail",
+                       kwargs={"product_slug": self.get_slug()})
 
 
 class ProductAttribute(models.Model):
@@ -168,7 +195,7 @@ class ProductItemAttribute(models.Model):
 
 
 class ProductMedia(models.Model):
-    img_url = models.ImageField(upload_to='product/%Y/%m/%d/',
+    img_url = models.ImageField(upload_to='product/%Y/%m/%d',
                                 blank=True, null=True)
     product_item = models.ForeignKey(
         ProductItem,

@@ -9,6 +9,7 @@ from django.db.models import IntegerField
 
 from inventory import models, forms
 from .logic import filter_products
+from cart.forms import CartAddProductForm
 
 
 def home(request):
@@ -177,6 +178,7 @@ def product_detail(request, product_slug):
                 'field_a',
                 'media',
                 'media__img_url',
+                'price',
             )
         attrs = models.ProductItem.objects\
             .filter(sku__in=filter_arguments)\
@@ -198,6 +200,7 @@ def product_detail(request, product_slug):
                     'field_a',
                     'media',
                     'media__img_url',
+                    'price',
                 )
 
     else:
@@ -213,6 +216,7 @@ def product_detail(request, product_slug):
                 'field_a',
                 'media',
                 'media__img_url',
+                'price',
             )
         attrs = models.ProductItem.objects\
             .filter(sku__in=[sku_values[0].get('product__sku')])\
@@ -220,12 +224,14 @@ def product_detail(request, product_slug):
                 'attribute_value__value',
                 'attribute_value__product_attribute__name'
             )
+    cart_product_form = CartAddProductForm()
 
     context = {
         'product': product,
         'category': models.Category.objects.get(id=category_id),
         'attrs': attrs,
-        'sku_values': sku_values
+        'sku_values': sku_values,
+        'cart_product_form': cart_product_form,
     }
     return render(request, 'product_detail.html', context)
 
