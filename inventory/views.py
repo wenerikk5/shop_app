@@ -9,7 +9,7 @@ from django.db.models import IntegerField
 
 from inventory import models, forms
 from .logic import filter_products
-from cart.forms import CartAddProductForm
+from cart.forms import CartAddProductForm, CartAddHiddenProductForm, CartForm
 
 
 def home(request):
@@ -142,6 +142,7 @@ def product_by_category(request, category_slug):
         'brands': brands,
         'brand_dict': brand_dict,
         'price_dict': price_dict,
+        'cart_product_form': CartAddHiddenProductForm()
     }
     return render(request, 'product_by_category.html', context)
 
@@ -158,7 +159,7 @@ def product_detail(request, product_slug):
         .filter(category__id=category_id)\
         .values('product__sku')
 
-    print('sku_values:', sku_values[0].get('product__sku'))    
+    print('sku_values:', sku_values[0].get('product__sku'))
 
     if request.GET:
         for value in request.GET.values():

@@ -143,26 +143,53 @@
             <div class="row row-cols-1 row-cols-md-4 g-4">
             {% for product in products %}
                 <div class="col">
-                    
-                    <div class="card h-100 px-0 py-0">
-                        <a href="{% url 'inventory:product_detail' product_slug=product.slug %}" class="text-decoration-none">
+                    {% with p=product.slug|get_product_first %}
+                    <div class="card h-100 px-0 py-0" data-id="{{ p.id }}">
+                        <a href="{{ product.id|get_product_url }}" class="text-decoration-none">
                             <img src="{{ product.product__media__img_url|get_url }}" class="card-img-top" alt="...">
                         </a>
+                        
                         <div class="card-body">
                             <h6>{{ product.name }}</h6>
+                            <h5>₽ {{ p.price|delimiter }}</h5>
                         </div>
                         <div class="card-footer px-0 py-0">
-                            <a href="#" class="btn btn-warning btn-my-xl fw-medium align-bottom">В корзину</a>
-                        </div>
-
+                            {% comment %} <a href="#" class="btn btn-warning btn-my-xl fw-medium align-bottom">В корзину</a> {% endcomment %}
+                            
+                            <form action="{% url 'cart:cart_add' p.sku %}" method="post">
+                                {{ cart_product_form }}
+                                {% csrf_token %}
+                                <input type="submit" value="В корзину" class="btn btn-warning btn-my-xl fw-medium align-bottom"  data-bs-toggle="modal" data-bs-target="#exampleModal1">
+                            </form>
+                            
+                        </div> 
                     </div>
-                    
+                    {% endwith %}
                     
                 </div>
-                
             {% endfor %}
             </div>
 
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="post" id="form2">
+                        {{ cart_product_form }}
+                        {% csrf_token %}
+                    </form>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+            </div>
         </div>
         
 
@@ -177,6 +204,20 @@
         let range_items = document.querySelectorAll('.range-attrs')
         let price_items = document.querySelectorAll('.price-attrs')
         let brand_items = document.querySelectorAll('.brand-attrs')
+
+        {% comment %} let trigger = document.querySelectorAll('input')
+        let form2 = document.querySelector('#form2')
+
+        trigger.forEach((el) => { el.addEventListener('click', function(){
+                let id = this.parentNode.parentNode.getAttribute('data-id');
+                let args1 = document.createElement("input");
+
+                console.log(form2.children[3])
+                //form2.appendChild(args1);
+                form2.children[3].value = 'Product'
+
+            })
+        }); {% endcomment %}
 
         submit.addEventListener('click', function(e){
             let args1 = document.createElement("input");

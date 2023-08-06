@@ -9,3 +9,22 @@ class CartAddProductForm(forms.Form):
     override = forms.BooleanField(required=False,
                                   initial=False,
                                   widget=forms.HiddenInput)
+
+
+class CartAddHiddenProductForm(forms.Form):
+    quantity = forms.TypedChoiceField(coerce=int,
+                                      initial=1,
+                                      widget=forms.HiddenInput)
+    override = forms.BooleanField(required=False,
+                                  initial=False,
+                                  widget=forms.HiddenInput)
+
+
+class CartForm(forms.Form):
+    quantity = forms.TypedChoiceField(coerce=int,
+                                      initial=1)
+    override = forms.BooleanField(required=False,
+                                  initial=False,
+                                  widget=forms.HiddenInput)
+    name = forms.CharField()
+    id = forms.IntegerField()

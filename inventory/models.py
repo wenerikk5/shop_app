@@ -84,10 +84,6 @@ class Product(models.Model):
         self.slug = name + '-' + tail
         return super().save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        return reverse("inventory:product_detail",
-                       kwargs={"product_slug": self.slug})
-
 
 class ProductItem(models.Model):
     sku = models.CharField(

@@ -1,4 +1,6 @@
 from django import template
+from django.urls import reverse
+from django.shortcuts import get_object_or_404
 from django.conf import settings
 from pathlib import Path
 from inventory import models
@@ -37,20 +39,43 @@ def get_url(media_path):
 
 @register.filter
 def delimiter(num):
-    return f'{num:,}'
+    if num:
+        return f'{num:,}'
+    return
 
 
 @register.filter
 def get_product_image(product_item_id):
-    media = models.ProductMedia.objects.get(product_item=product_item_id)
+    media = models.ProductMedia.objects.filter(product_item=product_item_id)
     if media:
-        return media.img_url.url
+        return media[0].img_url.url
     return '/media/no_image.png'
 
 
 @register.filter
 def get_product_image_thumb(product_item_id):
-    media = models.ProductMedia.objects.get(product_item=product_item_id)
+    media = models.ProductMedia.objects.filter(product_item=product_item_id)
     if media:
-        return media.img_url
-    return '/media/no_image.png'
+        return media[0].img_url
+
+    return 'no_image.png'
+
+
+@register.filter
+def get_product_url(product_id):
+    product = get_object_or_404(models.Product, id=product_id)
+    return reverse("inventory:product_detail",
+                   kwargs={"product_slug": product.slug})
+
+
+@register.filter
+def get_product_first(product_slug):
+    """
+    Return ProductItem with lowest price.
+    """
+    product = models.ProductItem.objects\
+        .filter(product__slug=product_slug)\
+        .order_by('price')\
+        .first()
+    return product
+

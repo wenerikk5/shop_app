@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.views.decorators.http import require_POST
 from inventory.models import ProductItem
 
 from .cart import Cart
 from .forms import CartAddProductForm
+from inventory import views
 
 
 @require_POST

@@ -9,12 +9,7 @@
 <div class="row">
         
     <div class="aside col-3 border">
-
-        {% if product.0.media %}
-            <img src="{% thumbnail product.0.media__img_url 150x150 crop %}" class="rounded">
-        {% else %}
-            <img src="{% thumbnail 'no_image.png' 150x150 crop %}" class="rounded">
-        {% endif %}
+        <img src="{% thumbnail product.0.media__img_url|default:'no_image.png' 150x150 crop %}" class="rounded">
         
     </div>
     
