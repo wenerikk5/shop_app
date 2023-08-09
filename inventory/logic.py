@@ -9,21 +9,15 @@ def filter_products(checkbox_filter_dict, range_filter_dict, brand_dict,
     products_by_attributes = models.Product.objects\
         .filter(category=category)
 
+    # filter checkbox args
     for name, values in checkbox_filter_dict.items():
         products_by_attributes = products_by_attributes\
             .filter(product__attribute_value__product_attribute__name__iexact=name,
-                    product__attribute_value__value__in=values)\
-            .values(
-                'id',
-                'product__attribute_value__product_attribute__name',
-                'product__attribute_value__value'
-            )
+                    product__attribute_value__value__in=values)
 
-    if checkbox_filter_dict:
-        product_ids = set([x.get('id') for x in products_by_attributes])
-    else:
-        product_ids = set([x.id for x in products_by_attributes])
+    product_ids = set(products_by_attributes.values_list('id', flat=True))
 
+    # filter range args
     for name, values in range_filter_dict.items():
         attribute_values = models.ProductAttributeValue.objects\
             .filter(product_item__product__id__in=product_ids)\
@@ -42,11 +36,10 @@ def filter_products(checkbox_filter_dict, range_filter_dict, brand_dict,
             attribute_values = attribute_values\
                 .filter(value_number__lte=values[1])
 
-        attribute_values = attribute_values.values(
-            'product_item__product__id'
-        )
-
-        ids = set([x.get('product_item__product__id') for x in attribute_values])
+        ids = set(attribute_values.values_list(
+            'product_item__product__id',
+            flat=True
+        ))
         print('product_ids:', product_ids)
         print('ids:', ids)
         product_ids = product_ids.intersection(ids)
@@ -65,8 +58,10 @@ def filter_products(checkbox_filter_dict, range_filter_dict, brand_dict,
             'product__media',
             'product__media__img_url',
         ).distinct('id')
+    # filter by brand
     if brand_dict:
         products = products.filter(brand__in=brand_dict.get('brand'))
+    # filter by price
     if price_dict.get('price', [0, 0])[0]:
         products = products.filter(product__price__gte=price_dict['price'][0])
     if price_dict.get('price', [0, 0])[1]:

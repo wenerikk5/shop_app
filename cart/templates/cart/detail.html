@@ -55,7 +55,9 @@
     </tbody>
   </table>
   <div class="d-flex flex-row-reverse">
-    <a href="#" class="btn btn-success">Оформить</a>
+    {% if cart %}
+      <a href="{% url "orders:order_create" %}" class="btn btn-success">Оформить</a>
+    {% endif %}
     <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-light mx-3">Продолжить покупки</a>
   </div>
 {% endblock %}

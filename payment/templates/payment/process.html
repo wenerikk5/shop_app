@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pay your order{% endblock %}
+
+{% block content %}
+{% load custom_tags %}
+{% load thumbnail %}
+  <h1>Order summary</h1>
+  <table class="table table-hover">
+    <thead class="table-success"> 
+      <tr>
+        <th>Image</th>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order.items.all %}
+        <tr class="row{% cycle "1" "2" %}">
+        <td>
+          <img src="{% thumbnail item.product.id|get_product_image_thumb 150x150 crop %}" class="rounded">
+        </td>
+        <td>{{ item.product.get_name }}</td>
+        <td class="num">₽ {{ item.price|delimiter }}</td>
+        <td class="num">{{ item.quantity }}</td>
+        <td class="num">₽ {{ item.get_cost|delimiter }}</td>
+        </tr>
+      {% endfor %}
+      <tr class="table-success">
+        <td colspan="4">Total</td>
+        <td class="num">₽ {{ order.get_total_cost|delimiter }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <form action="{% url "payment:process" %}" method="post">
+    <input type="submit" value="Pay now" class="btn btn-success">
+    {% csrf_token %}
+  </form>
+{% endblock %}

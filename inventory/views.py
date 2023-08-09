@@ -24,7 +24,8 @@ def categories(request):
 
 
 def category(request, category_slug):
-    categories = get_object_or_404(models.Category, slug=category_slug).get_children()
+    categories = get_object_or_404(models.Category, slug=category_slug)\
+                    .get_children()
 
     # print(TreeNodeChoiceField(queryset=models.Category.objects.all()))
 
@@ -69,9 +70,9 @@ def product_by_category(request, category_slug):
                 name, value = item.split(':')
                 name, limit = name.split('-')
                 if limit == 'min':
-                    range_filter_dict.setdefault(name, [None, None])[0] = int(value)
+                    range_filter_dict.setdefault(name, [None, None])[0] = float(value)
                 else:
-                    range_filter_dict.setdefault(name, [None, None])[1] = int(value)
+                    range_filter_dict.setdefault(name, [None, None])[1] = float(value)
             print('range_filter_dict', range_filter_dict)
 
         if len(request.POST.get('brand_attrs')) > 0:
@@ -87,9 +88,9 @@ def product_by_category(request, category_slug):
                 name, value = item.split(':')
                 name, limit = name.split('-')
                 if limit == 'min':
-                    price_dict.setdefault(name, [None, None])[0] = int(value)
+                    price_dict.setdefault(name, [None, None])[0] = float(value)
                 else:
-                    price_dict.setdefault(name, [None, None])[1] = int(value)
+                    price_dict.setdefault(name, [None, None])[1] = float(value)
             print('price_dict', price_dict)
 
         products = filter_products(checkbox_filter_dict, range_filter_dict,

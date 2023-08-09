@@ -19,3 +19,21 @@ services:
   #     - discovery.type=single-node
   #   ports:
   #     - 9500:9200
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+     - 5672:5672
+     - 15672:15672
+    
+  celery:
+    build:
+      context: .
+      dockerfile: worker.Dockerfile
+    command: celery -A shop_app worker -l info
+    network_mode: host
+    restart: always
+    environment:
+      rabbitmq_uri: amqp://127.0.0.1:5672
+    depends_on:
+     - rabbitmq

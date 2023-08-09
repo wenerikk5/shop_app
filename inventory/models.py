@@ -115,7 +115,7 @@ class ProductItem(models.Model):
         ]
 
     def __str__(self):
-        return f'Product item sku={self.sku}'
+        return f'{self.get_name()[:20]} (sku {self.sku})'
 
     def get_slug(self):
         return Product.objects.filter(product__sku=self.sku)[0].slug
