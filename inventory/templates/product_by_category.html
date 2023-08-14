@@ -146,7 +146,7 @@
                     {% with p=product.slug|get_product_first %}
                     <div class="card h-100 px-0 py-0" data-id="{{ p.id }}">
                         <a href="{{ product.id|get_product_url }}" class="text-decoration-none">
-                            <img src="{{ product.product__media__img_url|get_url }}" class="card-img-top" alt="...">
+                            <img src="{{ product.slug|get_image_by_product_slug }}" class="card-img-top" alt="...">
                         </a>
                         
                         <div class="card-body">
@@ -154,8 +154,7 @@
                             <h5>₽ {{ p.price|delimiter }}</h5>
                         </div>
                         <div class="card-footer px-0 py-0">
-                            {% comment %} <a href="#" class="btn btn-warning btn-my-xl fw-medium align-bottom">В корзину</a> {% endcomment %}
-                            
+
                             <form action="{% url 'cart:cart_add' p.sku %}" method="post">
                                 {{ cart_product_form }}
                                 {% csrf_token %}

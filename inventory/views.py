@@ -7,9 +7,13 @@ from mptt.forms import TreeNodeChoiceField
 from django.db.models.functions import Cast
 from django.db.models import IntegerField
 
+from django.contrib.postgres.search import SearchVector
+
 from inventory import models, forms
+from .recommender import Recommender
 from .logic import filter_products
 from cart.forms import CartAddProductForm, CartAddHiddenProductForm, CartForm
+from .forms import SearchForm
 
 
 def home(request):
@@ -228,12 +232,19 @@ def product_detail(request, product_slug):
             )
     cart_product_form = CartAddProductForm()
 
+    r = Recommender()
+    product_item = models.ProductItem.objects\
+        .filter(id=product[0].get('id'))[0]
+    recommended_products = r.suggest_products_for([product_item], 4)
+    print('====Recommended_product:', recommended_products)
+
     context = {
         'product': product,
         'category': models.Category.objects.get(id=category_id),
         'attrs': attrs,
         'sku_values': sku_values,
         'cart_product_form': cart_product_form,
+        'recommended_products': recommended_products,
     }
     return render(request, 'product_detail.html', context)
 
@@ -267,3 +278,22 @@ def add_product(request):
         print('=====New Product is added')
         return redirect('inventory:categories')
     return render(request, 'add_product.html', {'form': form})
+
+
+def product_search(request):
+    form = SearchForm()
+    query = None
+    results = []
+
+    if 'query' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            results = models.Product.objects.annotate(
+                search=SearchVector('name', 'description', 'brand'),
+            ).filter(search=query)
+
+    context = {'form': form,
+               'query': query,
+               'products': results}
+    return render(request, 'search.html', context)

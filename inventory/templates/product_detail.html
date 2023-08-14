@@ -66,6 +66,27 @@
                 {% endfor %}
             </tbody>
         </table>
+
+      {% if recommended_products %}
+        <h3>С этим товаром часто покупают:</h3>
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+          {% for p in recommended_products %}
+            <div class="col">
+
+                <div class="card h-100 px-0 py-0" data-id="{{ p.id }}">
+                    <a href="{{ p.id|get_product_item_url }}" class="text-decoration-none">
+                        <img src="{{ p.id|get_image_by_product_item_id }}" class="card-img-top" alt="...">
+                    </a>
+                    
+                    <div class="card-body text">
+                        <small>{{ p.get_name }}</small>
+                    </div>
+                </div>
+
+            </div>
+        {% endfor %}
+        </div>
+      {% endif %}
         
     </div>
 
@@ -78,6 +99,7 @@
         </form>
     </div>
 </div>
+
 <script>
     let textBoxes = document.querySelectorAll('[id^=target]');
 

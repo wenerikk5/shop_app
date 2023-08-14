@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% load custom_tags %}
+{% load thumbnail %}
+
+    <div class="row">
+        
+        <div class="aside col-3 border">
+            <h3> </h3>
+
+        </div>
+
+        <div class="col-9">
+          {% if query %}
+
+            <h1 class="my-3">Результаты поиска "{{ query }}"</h1>
+            {% with products.count as products_count %}
+              <h3>Найдено {{ products_count }} товаров.</h3>
+            {% endwith %}
+            <div class="row row-cols-1 row-cols-md-4 g-4">
+            {% for product in products %}
+                <div class="col">
+                    {% with p=product.slug|get_product_first %}
+                    <div class="card h-100 px-0 py-0" data-id="{{ p.id }}">
+                        <a href="{{ product.id|get_product_url }}" class="text-decoration-none">
+                            <img src="{{ product.slug|get_image_by_product_slug }}" class="card-img-top" alt="...">
+                        </a>
+                        
+                        <div class="card-body">
+                            <h6>{{ product.name }}</h6>
+                            <h5>₽ {{ p.price|delimiter }}</h5>
+                        </div>
+                        <div class="card-footer px-0 py-0">
+                            <form action="{% url 'cart:cart_add' p.sku %}" method="post">
+                                {{ cart_product_form }}
+                                {% csrf_token %}
+                                <input type="submit" value="В корзину" class="btn btn-warning btn-my-xl fw-medium align-bottom"  data-bs-toggle="modal" data-bs-target="#exampleModal1">
+                            </form>
+                            
+                        </div> 
+                    </div>
+                    {% endwith %}
+                    
+                </div>
+            {% endfor %}
+            </div>
+
+          {% else %}
+
+            {% comment %} <h1 class="my-3">Поиск товаров</h1>
+            <form method="get" action="{% url 'inventory:product_search' %}">
+              {{ form.as_p }}
+              <input type="submit" value="Найти">
+            </form> {% endcomment %}
+
+          {% endif %}
+        </div>
+    </div>
+{% endblock %}
+

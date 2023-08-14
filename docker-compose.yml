@@ -37,3 +37,11 @@ services:
       rabbitmq_uri: amqp://127.0.0.1:5672
     depends_on:
      - rabbitmq
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - 6379:6379
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes

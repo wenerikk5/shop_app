@@ -1,6 +1,11 @@
 from django import forms
 
 
+class SearchForm(forms.Form):
+    query = forms.CharField()
+
+
+# delete
 class ProductForm(forms.Form):
     slug_product = forms.CharField()
     name_product = forms.CharField()
@@ -13,17 +18,4 @@ class ProductForm(forms.Form):
 
     value_attribute = forms.CharField()
 
-# Product:
-#     slug, name, category_id, description,
 
-# product_item:
-#     sku
-
-# ProductAttribute:
-#     category_id, name
-
-# ProductAttributeValue:
-#     product_attribute_id, value
-
-# ProductItemAttribute:
-#     product_item_id, product_attribute_value
