@@ -5,7 +5,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from mptt.forms import TreeNodeChoiceField
 
 from django.db.models.functions import Cast
-from django.db.models import IntegerField
+from django.db.models import IntegerField, Prefetch
 
 from django.contrib.postgres.search import SearchVector
 
@@ -20,22 +20,32 @@ def home(request):
     return render(request, 'index.html')
 
 
-def categories(request):
-    categories = models.Category.objects.filter(level=0).all()
+def category(request, category_slug=None):
+    if category_slug:
+        current_category = get_object_or_404(models.Category,
+                                             slug=category_slug)
 
-    return render(request, 'category.html',
-                  {'categories': categories})
+    all_categories = models.Category.objects.select_related('parent')
+    categories_dict = {}
 
+    for cat in all_categories:
+        if cat.parent:
+            key = cat.parent.id
+        else:
+            key = 0
+        categories_dict.setdefault(key, []).append(cat)
 
-def category(request, category_slug):
-    categories = get_object_or_404(models.Category, slug=category_slug)\
-                    .get_children()
-
-    # print(TreeNodeChoiceField(queryset=models.Category.objects.all()))
-
-    context = {
-        'categories': categories,
-    }
+    if category_slug:
+        context = {
+            'current_category': current_category,
+            'categories': categories_dict.get(current_category.id),
+            'categories_dict': categories_dict
+        }
+    else:
+        context = {
+            'categories': all_categories,
+            'categories_dict': categories_dict
+        }
     return render(request, 'category.html', context)
 
 

@@ -93,3 +93,12 @@ def get_product_first(product_slug):
 @register.filter
 def addclass(field, css):
     return field.as_widget(attrs={'class': css})
+
+
+@register.filter
+def get_dict_item(dictionary, key):
+    if dictionary and key:
+        return dictionary.get(key)
+    elif dictionary:
+        return dictionary.get(0)
+    return
