@@ -69,12 +69,12 @@
         <div class="col">
 
             <div class="card h-100 px-0 py-0" data-id="{{ p.id }}">
-                <a href="{{ p.id|get_product_item_url }}" class="text-decoration-none">
-                    <img src="{{ p.id|get_image_by_product_item_id }}" class="card-img-top" alt="...">
+                <a href="{% url "inventory:product_detail" p.product__slug %}" class="text-decoration-none">
+                    <img src="{{ p.media__img_url|url }}" class="card-img-top" alt="...">
                 </a>
                 
                 <div class="card-body text">
-                    <small>{{ p.get_name }}</small>
+                    <small>{{ p.product__name }}</small>
                 </div>
             </div>
 

@@ -222,96 +222,86 @@ def product_by_category(request, category_slug):
 def product_detail(request, product_slug):
     filter_arguments = []
 
-    category_id = models.Product.objects\
-        .filter(slug=product_slug)\
-        .first().category.id
+    category = get_object_or_404(models.Category, product__slug=product_slug)
 
     sku_values = models.Product.objects\
         .filter(slug=product_slug)\
-        .filter(category__id=category_id)\
-        .values('product__sku')
-
-    print('sku_values:', sku_values[0].get('product__sku'))
+        .values_list('product__sku', flat=True)
 
     if request.GET:
         for value in request.GET.values():
             filter_arguments.append(value)
-        print('filter_args:', filter_arguments)
 
         product = models.ProductItem.objects\
             .filter(product__slug=product_slug)\
             .filter(sku__in=filter_arguments)\
-            .annotate(field_a=ArrayAgg('sku'))\
             .values(
                 'id',
                 'sku',
+                'price',
+                'product__id',
                 'product__name',
                 'product__description',
-                'field_a',
                 'media',
                 'media__img_url',
-                'price',
-            )
-        attrs = models.ProductItem.objects\
-            .filter(sku__in=filter_arguments)\
-            .values(
-                'attribute_value__value',
-                'attribute_value__product_attribute__name'
-            )
-        print('===attrs:', attrs)
+            )\
+            .order_by('price')[0]
+
+        # NEEDS CHECK
         if len(product) < 1:
             product = models.ProductItem.objects\
                 .filter(product__slug=product_slug)\
-                .annotate(field_a=ArrayAgg('sku'))\
+                .filter(sku__in=filter_arguments)\
                 .values(
                     'id',
                     'sku',
+                    'price',
+                    'product__id',
                     'product__name',
                     'product__description',
-                    'field_a',
                     'media',
                     'media__img_url',
-                    'price',
-                )
+                )[0]
 
     else:
         product = models.ProductItem.objects\
             .filter(product__slug=product_slug)\
-            .annotate(field_a=ArrayAgg('sku'))\
             .values(
                 'id',
                 'sku',
+                'price',
+                'product__id',
                 'product__name',
                 'product__description',
-                'field_a',
                 'media',
                 'media__img_url',
-                'price',
+            )\
+            .order_by('price')[0]
+        filter_arguments.append(product.get('sku'))
+
+    attrs = models.ProductItem.objects\
+        .filter(sku__in=filter_arguments)\
+        .values(
+            'attribute_value__value',
+            'attribute_value__product_attribute__name'
             )
-        attrs = models.ProductItem.objects\
-            .filter(sku__in=[sku_values[0].get('product__sku')])\
-            .values(
-                'attribute_value__value',
-                'attribute_value__product_attribute__name'
-            )
-    print('=====product.field_a:', product)
 
     cart_product_form = CartAddProductForm()
 
     r = Recommender()
-    product_item = models.ProductItem.objects\
-        .filter(id=product[0].get('id'))[0]
-    recommended_products = r.suggest_products_for([product_item], 4)
-    print('====Recommended_product:', recommended_products)
+    recommended_products = r.suggest_products_for([product], 4)
+    # print('====product_item:', product)
+    # print('====recommended products:', recommended_products)
+
 
     context = {
         'product': product,
-        'category': models.Category.objects.get(id=category_id),
+        'category': category,
         'attrs': attrs,
         'sku_values': sku_values,
         'cart_product_form': cart_product_form,
-        'recommended_products': recommended_products,
         'filter_args': filter_arguments,
+        'recommended_products': recommended_products,
     }
     return render(request, 'product_detail.html', context)
 
