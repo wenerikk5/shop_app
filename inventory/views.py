@@ -17,7 +17,58 @@ from .forms import SearchForm
 
 
 def home(request):
-    return render(request, 'index.html')
+    product_slug = 'smartfon-apple-iphone-14-pro-d-d95a8a'
+
+    filter_arguments = []
+
+    category = get_object_or_404(models.Category, product__slug=product_slug)
+
+    sku_values = models.Product.objects\
+        .filter(slug=product_slug)\
+        .values_list('product__sku', flat=True)
+
+    product = models.ProductItem.objects\
+        .filter(product__slug=product_slug)\
+        .values(
+            'id',
+            'sku',
+            'price',
+            'product__id',
+            'product__name',
+            'product__description',
+            'media',
+            'media__img_url',
+        )\
+        .order_by('price')[0]
+
+    if not filter_arguments:
+        filter_arguments.append(product.get('sku'))
+
+    attrs = models.ProductItem.objects\
+        .filter(sku__in=filter_arguments)\
+        .values(
+            'attribute_value__value',
+            'attribute_value__product_attribute__name'
+        )
+
+    cart_product_form = CartAddProductForm()
+
+    r = Recommender()
+
+    recommended_products = r.suggest_products_for([product], 4)
+
+    context = {
+        'product': product,
+        'category': category,
+        'attrs': attrs,
+        'sku_values': list(sku_values),
+        'cart_product_form': cart_product_form,
+        'filter_args': filter_arguments,
+        'recommended_products': recommended_products,
+    }
+
+
+    return render(request, 'index.html', context)
 
 
 def category(request, category_slug=None):
@@ -119,10 +170,15 @@ def product_by_category(request, category_slug):
                 'brand',
                 'category__name',
                 'product__price',
-                'description',
-                'product__media',
+                'product__sku',
                 'product__media__img_url',
-            ).distinct('id')
+            )\
+            .order_by('product__price')
+    unique_prods = []
+
+    for i in range(len(products)):
+        if i == 0 or products[i].get('id') != products[i-1].get('id'):
+            unique_prods.append(products[i])
 
     # all attributes for certain category (list in filters)
     category_attrs = models.ProductAttribute.objects.filter(
@@ -145,10 +201,8 @@ def product_by_category(request, category_slug):
         .values('brand')\
         .distinct()
 
-    print('brands:', brands)
-
     context = {
-        'products': products,
+        'products': unique_prods,
         'category': category,
         'category_attrs': category_attrs,
         'attr_values': attr_values,
@@ -161,6 +215,9 @@ def product_by_category(request, category_slug):
     }
     return render(request, 'product_by_category.html', context)
 
+
+
+# PRODUCT DETAIL
 
 def product_detail(request, product_slug):
     filter_arguments = []
@@ -183,7 +240,6 @@ def product_detail(request, product_slug):
 
         product = models.ProductItem.objects\
             .filter(product__slug=product_slug)\
-            .filter(product__category__id=category_id)\
             .filter(sku__in=filter_arguments)\
             .annotate(field_a=ArrayAgg('sku'))\
             .values(
@@ -206,7 +262,6 @@ def product_detail(request, product_slug):
         if len(product) < 1:
             product = models.ProductItem.objects\
                 .filter(product__slug=product_slug)\
-                .filter(product__category__id=category_id)\
                 .annotate(field_a=ArrayAgg('sku'))\
                 .values(
                     'id',
@@ -222,7 +277,6 @@ def product_detail(request, product_slug):
     else:
         product = models.ProductItem.objects\
             .filter(product__slug=product_slug)\
-            .filter(product__category__id=category_id)\
             .annotate(field_a=ArrayAgg('sku'))\
             .values(
                 'id',
@@ -240,6 +294,8 @@ def product_detail(request, product_slug):
                 'attribute_value__value',
                 'attribute_value__product_attribute__name'
             )
+    print('=====product.field_a:', product)
+
     cart_product_form = CartAddProductForm()
 
     r = Recommender()
@@ -255,8 +311,17 @@ def product_detail(request, product_slug):
         'sku_values': sku_values,
         'cart_product_form': cart_product_form,
         'recommended_products': recommended_products,
+        'filter_args': filter_arguments,
     }
     return render(request, 'product_detail.html', context)
+
+
+
+
+
+
+
+
 
 
 def add_product(request):

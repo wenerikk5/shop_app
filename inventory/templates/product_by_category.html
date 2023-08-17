@@ -141,21 +141,21 @@
 
             <h1 class="my-3">{{ category.name }}</h1>
             <div class="row row-cols-1 row-cols-md-4 g-4">
-            {% for product in products %}
+                {% for product in products %}
                 <div class="col">
-                    {% with p=product.slug|get_product_first %}
+
                     <div class="card h-100 px-0 py-0" data-id="{{ p.id }}">
-                        <a href="{{ product.id|get_product_url }}" class="text-decoration-none">
-                            <img src="{{ product.slug|get_image_by_product_slug }}" class="card-img-top" alt="...">
+                        <a href="{% url "inventory:product_detail" product.slug %}" class="text-decoration-none">
+                            <img src="{{ product.product__media__img_url|url }}" class="card-img-top" alt="product img">
                         </a>
                         
                         <div class="card-body">
                             <h6>{{ product.name }}</h6>
-                            <h5>₽ {{ p.price|delimiter }}</h5>
+                            <h5>₽ {{ product.product__price|delimiter }}</h5>
                         </div>
                         <div class="card-footer px-0 py-0">
-
-                            <form action="{% url 'cart:cart_add' p.sku %}" method="post">
+        
+                            <form action="{% url 'cart:cart_add' product.product__sku %}" method="post">
                                 {{ cart_product_form }}
                                 {% csrf_token %}
                                 <input type="submit" value="В корзину" class="btn btn-warning btn-my-xl fw-medium align-bottom"  data-bs-toggle="modal" data-bs-target="#exampleModal1">
@@ -163,10 +163,9 @@
                             
                         </div> 
                     </div>
-                    {% endwith %}
                     
                 </div>
-            {% endfor %}
+                {% endfor %}
             </div>
 
         </div>

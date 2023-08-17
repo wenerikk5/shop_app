@@ -1,0 +1,19 @@
+
+input[name="for-menu"]{...}
+
+/* Лучше выделить классом */
+.menu {
+    display: none;
+}
+
+/* Скрываем чекбокс */
+.menuToggle {
+    display: none;
+}
+
+/* :checked - это состояние отмеченного инпута */
+/* можно использовать "+" или "~" */
+.menuToggle:checked ~ .menu {
+    display: block;
+}
+    

@@ -1,5 +1,6 @@
 from django import template
 from django.urls import reverse
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from pathlib import Path
@@ -31,8 +32,22 @@ def from_list(d, key):
 
 @register.filter
 def get_image_by_product_slug(product_slug):
-    product_item_id = get_product_first(product_slug).id
-    return get_image_by_product_item_id(product_item_id)
+    # product_item_id = get_product_first(product_slug).id
+    # return get_image_by_product_item_id(product_item_id)
+
+    product = models.ProductItem.objects\
+            .filter(product__slug=product_slug)\
+            .values('media', 'media__img_url')\
+            .order_by('price')\
+            .first()
+    if product:
+        media = product.get('media__img_url')
+    else:
+        media = ''
+    if media:
+        print('====media url:', media)
+        return f'/media/{media}'
+    return '/media/no_image.png'
 
 
 @register.filter
@@ -102,3 +117,10 @@ def get_dict_item(dictionary, key):
     elif dictionary:
         return dictionary.get(0)
     return
+
+
+@register.filter
+def url(media):
+    if media:
+        return f'/media/{media}'
+    return '/media/no_image.png'

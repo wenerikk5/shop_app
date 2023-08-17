@@ -29,7 +29,7 @@
         <div class="mb-3">
             <p class='fs-6 fw-medium mb-2'>Модификации товара:</p>
             {% for p in sku_values %}
-                {% if p.product__sku in product.0.field_a %}
+                {% if p.product__sku in filter_args %}
                     <li id="target-{{ p.product__sku }}"
                         class="btn btn-outline-warning text-dark"
                         data-attribute="sku"

@@ -24,7 +24,10 @@ class Recommender:
                               with_id)
 
     def suggest_products_for(self, products, max_results=6):
-        product_ids = [p.product.id for p in products]
+        if products and isinstance(products[0], dict):
+            product_ids = [p.get('product__id') for p in products]
+        else:
+            product_ids = [p.product.id for p in products]
         if len(products) == 1:
             # only 1 product
             suggestions = r.zrange(
@@ -48,9 +51,16 @@ class Recommender:
 
         suggested_products_ids = [int(id) for id in suggestions]
         # get suggested products and sort by order of appearance
-        suggested_products = list(ProductItem.objects.filter(
-            id__in=suggested_products_ids))
-        suggested_products.sort(key=lambda x: suggested_products_ids.index(x.id))
+        suggested_products = list(
+            ProductItem.objects\
+                .filter(id__in=suggested_products_ids)\
+                .values(
+                    'id',
+                    'product__slug',
+                    'product__name',
+                    'media__img_url',
+                ))
+        suggested_products.sort(key=lambda x: suggested_products_ids.index(x.get('id')))
         return suggested_products
 
     def clear_purchases(self):
