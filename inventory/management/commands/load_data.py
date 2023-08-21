@@ -12,7 +12,7 @@ from inventory.models import (
     ProductMedia,
     ProductAttribute,
     ProductAttributeValue,
-    ProductItemAttribute
+    ProductItemAttribute,
 )
 
 
@@ -33,6 +33,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Заполняем данные моделей информацией из CSV таблиц."""
         with open(f'{settings.BASE_DIR}/data/Category.csv', 'r', encoding='utf-8-sig') as csvfile:
+            # remove exist rows (if any)
+            # Category.objects.all().delete()
             reader = csv.DictReader(csvfile)
             for row in reader:
                 c = Category.objects.create(
@@ -50,6 +52,8 @@ class Command(BaseCommand):
             print(f'Данные для таблицы Category успешно загружены')
 
         with open(f'{settings.BASE_DIR}/data/Product.csv', 'r', encoding='utf-8-sig') as csvfile:
+            # remove exist rows (if any)
+            Product.objects.all().delete()
             reader = csv.DictReader(csvfile)
             for row in reader:
                 name = slugify(row['name'])
@@ -67,6 +71,11 @@ class Command(BaseCommand):
                 )
             print(f'Данные для таблицы Product успешно загружены')
 
+        # remove exist rows in model tables:
+        for model in Models.keys():
+            model.objects.all().delete()
+
+        # fill tables with data
         for model, csv_files in Models.items():
             with open(
                 f'{settings.BASE_DIR}/data/{csv_files}',

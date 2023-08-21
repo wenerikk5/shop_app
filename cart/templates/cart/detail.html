@@ -23,11 +23,11 @@
         {% with product=item.product %}
           <tr>
             <td>
-              <a href="{{ product.get_absolute_url }}">
-                <img src="{% thumbnail product.id|get_product_image_thumb 150x150 crop %}" class="rounded">
+              <a href="{% url "inventory:product_detail" product.product.slug %}">
+                <img src="{% thumbnail product.media_item.0.img_url|default:'no_image.png' 150x150 crop %}" class="rounded">
               </a>
             </td>
-            <td>{{ product.get_name }}</td>
+            <td>{{ product.product.name }}</td>
             <td>
               <form action="{% url 'cart:cart_add' product.sku %}" method="post">
                 {{ item.update_quantity_form.quantity }}

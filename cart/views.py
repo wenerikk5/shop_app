@@ -38,6 +38,7 @@ def cart_detail(request):
                                         'quantity': item['quantity'],
                                         'override': True})
         products.append(item.get('product'))
+        # print('=====cart item:', item)
 
     r = Recommender()
     recommended_products = r.suggest_products_for(products, 4)

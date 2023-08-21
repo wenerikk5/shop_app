@@ -33,6 +33,8 @@ class Recommender:
             suggestions = r.zrange(
                 self.get_product_key(product_ids[0]),
                 0, -1, desc=True)[:max_results]
+        elif not products:
+            return
         else:
             # temporary key
             flat_ids = ''.join([str(id) for id in product_ids])
@@ -52,14 +54,15 @@ class Recommender:
         suggested_products_ids = [int(id) for id in suggestions]
         # get suggested products and sort by order of appearance
         suggested_products = list(
-            ProductItem.objects\
-                .filter(id__in=suggested_products_ids)\
-                .values(
-                    'id',
-                    'product__slug',
-                    'product__name',
-                    'media__img_url',
-                ))
+            ProductItem.objects
+            .filter(id__in=suggested_products_ids)
+            .values(
+                'id',
+                'product__slug',
+                'product__name',
+                'media__img_url',
+            )
+        )
         suggested_products.sort(key=lambda x: suggested_products_ids.index(x.get('id')))
         return suggested_products
 

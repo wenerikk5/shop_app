@@ -1,7 +1,7 @@
 {% load custom_tags %}
-<nav class="navbar  fixed-top navbar-expand-lg bg-body-tertiary container">
-
-    <div class="container-fluid">
+<nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
+    
+    <div class="container container-fluid">
         <a class="navbar-brand" href="{% url 'inventory:categories' %}">Shop Brand</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -19,12 +19,12 @@
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Dropdown
                     </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Action</a></li>
-                    <li><a class="dropdown-item" href="#">Another action</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">Something else here</a></li>
-                </ul>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
                 </li>
             </ul>
             
@@ -34,7 +34,7 @@
             </form>
 
             <div class="mx-4">
-              {% with total_items=cart|length %}
+            {% with total_items=cart|length %}
                 {% if total_items > 0 %}
                     В корзине:
                     <a href="{% url "cart:cart_detail" %}">
@@ -44,23 +44,23 @@
                 {% elif not order %}
                     Корзина пуста
                 {% endif %}
-              {% endwith %}
+            {% endwith %}
             </div>
 
             <div class="d-flex flex-column align-items-center">
                 {% if user.is_authenticated %}
-                  <div class="">
+                <div class="">
                     <small>Welcome, <a href="#" class="font-link"><strong>@{{ user.username }}</strong></a></small>
-                  </div>
-                  <div class="justify-content-center">
-                    <a href="#" class="badge bg-secondary text-light">Logout</a>
-                  </div>
+                </div>
+                <div class="justify-content-center">
+                    <a href="{% url "logout" %}" class="badge bg-secondary text-light">Logout</a>
+                </div>
                 {% else %}
-                  <a href="#"><button class="btn btn-outline-secondary">Login</button></a>
+                <a href="{% url "login" %}"><button class="btn btn-outline-secondary">Login</button></a>
                 {% endif %}
             </div>
 
         </div>
     </div>
-
+    
 </nav>

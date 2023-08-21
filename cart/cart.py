@@ -1,7 +1,8 @@
 from decimal import Decimal
 from django.conf import settings
+from django.db.models import Prefetch
 
-from inventory.models import ProductItem
+from inventory.models import ProductItem, ProductMedia
 
 
 class Cart:
@@ -36,7 +37,17 @@ class Cart:
 
     def __iter__(self):
         product_ids = self.cart.keys()
-        products = ProductItem.objects.filter(id__in=product_ids)
+        
+        product_media = ProductMedia.objects\
+            .filter(product_item__in=product_ids)
+
+        products = ProductItem.objects\
+            .filter(id__in=product_ids)\
+            .select_related('product')\
+            .prefetch_related(
+                Prefetch('media', queryset=product_media, to_attr="media_item")
+            )
+
         cart = self.cart.copy()
         for product in products:
             cart[str(product.id)]['product'] = product

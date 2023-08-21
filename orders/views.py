@@ -17,8 +17,13 @@ def order_create(request):
 
     if request.method == 'POST':
         form = OrderCreateForm(request.POST)
+
         if form.is_valid():
-            order = form.save()
+            order = form.save(commit=False)
+            if request.user.is_authenticated:
+                order.user = request.user
+            order.save()
+
             for item in cart:
                 OrderItem.objects.create(order=order,
                                          product=item['product'],
@@ -33,7 +38,19 @@ def order_create(request):
             # redirect to payment
             return redirect(reverse('payment:process'))
     else:
-        form = OrderCreateForm()
+        if request.user.is_authenticated:
+            # add data from user's account (if any)
+            user_data = {
+                'first_name': request.user.first_name or None,
+                'last_name': request.user.last_name or None,
+                'email': request.user.email or None,
+                'address': request.user.address or None,
+                'postal_code': request.user.postal_code or None,
+                'city': request.user.city or None,
+                }
+            form = OrderCreateForm(user_data)
+        else:
+            form = OrderCreateForm()
     return render(request,
                   'orders/order/create.html',
                   {'cart': cart, 'form': form})
