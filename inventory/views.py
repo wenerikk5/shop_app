@@ -5,7 +5,6 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from mptt.forms import TreeNodeChoiceField
 
 from django.db.models.functions import Cast
-from django.db.models import IntegerField, Prefetch
 
 from django.contrib.postgres.search import SearchVector
 
@@ -17,58 +16,7 @@ from .forms import SearchForm
 
 
 def home(request):
-    product_slug = 'smartfon-apple-iphone-14-pro-d-d95a8a'
-
-    filter_arguments = []
-
-    category = get_object_or_404(models.Category, product__slug=product_slug)
-
-    sku_values = models.Product.objects\
-        .filter(slug=product_slug)\
-        .values_list('product__sku', flat=True)
-
-    product = models.ProductItem.objects\
-        .filter(product__slug=product_slug)\
-        .values(
-            'id',
-            'sku',
-            'price',
-            'product__id',
-            'product__name',
-            'product__description',
-            'media',
-            'media__img_url',
-        )\
-        .order_by('price')[0]
-
-    if not filter_arguments:
-        filter_arguments.append(product.get('sku'))
-
-    attrs = models.ProductItem.objects\
-        .filter(sku__in=filter_arguments)\
-        .values(
-            'attribute_value__value',
-            'attribute_value__product_attribute__name'
-        )
-
-    cart_product_form = CartAddProductForm()
-
-    r = Recommender()
-
-    recommended_products = r.suggest_products_for([product], 4)
-
-    context = {
-        'product': product,
-        'category': category,
-        'attrs': attrs,
-        'sku_values': list(sku_values),
-        'cart_product_form': cart_product_form,
-        'filter_args': filter_arguments,
-        'recommended_products': recommended_products,
-    }
-
-
-    return render(request, 'index.html', context)
+    return render(request, 'index.html')
 
 
 def category(request, category_slug=None):
@@ -216,9 +164,6 @@ def product_by_category(request, category_slug):
     return render(request, 'product_by_category.html', context)
 
 
-
-# PRODUCT DETAIL
-
 def product_detail(request, product_slug):
     filter_arguments = []
 
@@ -291,8 +236,7 @@ def product_detail(request, product_slug):
     r = Recommender()
     recommended_products = r.suggest_products_for([product], 4)
     # print('====product_item:', product)
-    # print('====recommended products:', recommended_products)
-
+    # print('====recommended products:', recommended_products
 
     context = {
         'product': product,
@@ -304,14 +248,6 @@ def product_detail(request, product_slug):
         'recommended_products': recommended_products,
     }
     return render(request, 'product_detail.html', context)
-
-
-
-
-
-
-
-
 
 
 def add_product(request):
