@@ -72,6 +72,9 @@ class Product(models.Model):
     )
     description = models.TextField(blank=True, null=True)
 
+    class Meta:
+        ...
+
     def __str__(self):
         return self.name
 

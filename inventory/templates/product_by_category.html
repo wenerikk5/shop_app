@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load ratings %}
 
 {% block content %}
 {% load custom_tags %}
@@ -151,6 +152,7 @@
                         
                         <div class="card-body">
                             <h6>{{ product.name }}</h6>
+                            {% ratings product|get_model icon_height=20 icon_width=20 template_name='star_ratings/widget_list.html' %}
                             <h5>₽ {{ product.product__price|delimiter }}</h5>
                         </div>
                         <div class="card-footer px-0 py-0">

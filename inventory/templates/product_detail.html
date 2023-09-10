@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load ratings %}
 
 {% block content %}
 {% load custom_tags %}
@@ -25,6 +26,7 @@
         </div>
 
         <h1 class="">{{ product.product__name }}</h1>
+        {% ratings product|get_model icon_height=20 icon_width=20 template_name='star_ratings/widget_detail.html' %}
 
         <div class="mb-3">
             <p class='fs-6 fw-medium mb-2'>Модификации товара:</p>

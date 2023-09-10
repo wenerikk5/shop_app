@@ -1,0 +1,5 @@
+{% extends "star_ratings/widget_base.html" %}
+{% load custom_tags %}
+{% block rating_detail %}
+    <span class="text-dark h4">{{ rating.average|floatformat:"-1" }}<span> <span class="text-secondary h4">({{ rating.count|score }})<span>
+{% endblock rating_detail %}

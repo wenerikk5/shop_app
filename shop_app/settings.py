@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'easy_thumbnails',
     # 'sorl.thumbnail',
+    'star_ratings',
 ]
 
 MIDDLEWARE = [
@@ -178,3 +179,6 @@ STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 1
+
+# Rating settings
+STAR_RATINGS_RERATE = False

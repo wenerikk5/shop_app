@@ -1,0 +1,6 @@
+{% extends "star_ratings/widget_base.html" %}
+{% block rating_detail %}
+
+<span class="text-dark h6 px-1">{{ rating.average|floatformat:"-1" }}</span><span class="text-secondary h6">/ {{ rating.count }}</span>
+
+{% endblock rating_detail %}

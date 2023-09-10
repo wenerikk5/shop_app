@@ -124,3 +124,16 @@ def url(media):
     if media:
         return f'/media/{media}'
     return '/media/no_image.png'
+
+
+@register.filter
+def get_model(data):
+    product = get_object_or_404(models.ProductItem, id=data.get('id'))
+    return product
+
+
+@register.filter
+def score(number):
+    if float(number) == 1.0:
+        return f'{number} оценка'
+    return f'{number} оценок'

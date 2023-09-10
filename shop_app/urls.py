@@ -12,6 +12,7 @@ urlpatterns = [
     path('orders/', include('orders.urls', namespace='orders')),
     path('payment/', include('payment.urls', namespace='payment')),
     path('__debug__/', include("debug_toolbar.urls")),
+    path('ratings/', include('star_ratings.urls', namespace='ratings')),
     path('', include('inventory.urls', namespace='inventory')),
 ]
 
