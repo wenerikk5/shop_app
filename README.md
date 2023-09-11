@@ -67,16 +67,16 @@ python3 manage.py runserver
 
 ## DB structure
 
-    <img src="https://github.com/wenerikk5/shop_app/blob/9fca690268afc308af347d8c75792c261ff17332/data/previews/db.png">
+<img src="https://github.com/wenerikk5/shop_app/blob/9fca690268afc308af347d8c75792c261ff17332/data/previews/db.png">
 
 
 ## Previews
 
-    <img src="https://github.com/wenerikk5/shop_app/blob/9fca690268afc308af347d8c75792c261ff17332/data/previews/category_subcategory.png">
+<img src="https://github.com/wenerikk5/shop_app/blob/9fca690268afc308af347d8c75792c261ff17332/data/previews/category_subcategory.png">
 
-    <img src="https://github.com/wenerikk5/shop_app/blob/9fca690268afc308af347d8c75792c261ff17332/data/previews/category_products.png">
+<img src="https://github.com/wenerikk5/shop_app/blob/9fca690268afc308af347d8c75792c261ff17332/data/previews/category_products.png">
 
-    <img src="https://github.com/wenerikk5/shop_app/blob/9fca690268afc308af347d8c75792c261ff17332/data/previews/product_detail.png">
+<img src="https://github.com/wenerikk5/shop_app/blob/9fca690268afc308af347d8c75792c261ff17332/data/previews/product_detail.png">
 
-    <img src="https://github.com/wenerikk5/shop_app/blob/9fca690268afc308af347d8c75792c261ff17332/data/previews/cart.png">
+<img src="https://github.com/wenerikk5/shop_app/blob/9fca690268afc308af347d8c75792c261ff17332/data/previews/cart.png">
 
